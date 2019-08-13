@@ -54,7 +54,7 @@ gulp.task("default", () => {
 
 gulp.task("prd-clean-assets-png", function() {
   return gulp
-    .src("dist/res/*.png", {
+    .src("dist/inlined/*.png", {
       read: false
     })
     .pipe(clean());
@@ -62,7 +62,7 @@ gulp.task("prd-clean-assets-png", function() {
 
 gulp.task("prd-clean-assets-json", function() {
   return gulp
-    .src("dist/res/*.json", {
+    .src("dist/inlined/*.json", {
       read: false
     })
     .pipe(clean());
@@ -74,7 +74,7 @@ gulp.task(
     return gulp
       .src("src/res/*.png")
       .pipe(imagemin({ progressive: true }))
-      .pipe(gulp.dest("dist/res"));
+      .pipe(gulp.dest("dist/inlined"));
   })
 );
 
@@ -84,7 +84,7 @@ gulp.task(
     return gulp
       .src("src/res/*.json")
       .pipe(jsonMinify())
-      .pipe(gulp.dest("dist/res"));
+      .pipe(gulp.dest("dist/inlined"));
   })
 );
 
