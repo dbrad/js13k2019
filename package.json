@@ -1,0 +1,39 @@
+{
+  "name": "project-name",
+  "author": {
+    "name": "David Brad",
+    "email": "davidbrad.015@gmail.com"
+  },
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "serve": "parcel ./src/html/index.html -d ./build",
+    "check-file-size": "yarn node ./scripts/check-file-size.js",
+    "delete-dist": "yarn rimraf ./dist",
+    "create-dist": "yarn mkdirp ./dist/inlined ./dist/zipped",
+    "parcel-build": "parcel build ./src/html/index.html -d ./dist/bundled --no-source-maps",
+    "inline-build": "html-inline -i ./dist/bundled/index.html -o ./dist/inlined/index.html",
+    "build": "yarn run delete-dist && yarn run create-dist && yarn run parcel-build && yarn run inline-build && gulp prd-build-assets",
+    "build-zipped": "yarn run build && yarn node ./scripts/zip-file.js",
+    "party": "yarn run build-zipped && yarn run check-file-size"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.2",
+    "archiver": "^3.0.0",
+    "chalk": "^2.4.2",
+    "cssnano": "^4.1.10",
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-imagemin": "^5.0.3",
+    "gulp-json-minify": "^1.2.2",
+    "html-inline": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.6.3",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5",
+    "typescript-tslint-plugin": "^0.4.0"
+  },
+  "browserslist": [
+    "last 3 Chrome version"
+  ]
+}
