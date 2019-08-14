@@ -3,7 +3,7 @@ var clean = require("gulp-clean");
 var imagemin = require("gulp-imagemin");
 var jsonMinify = require("gulp-json-minify");
 
-gulp.task("clean-assets-png", function() {
+gulp.task("clean-assets-png", () => {
   return gulp
     .src("build/*.png", {
       read: false
@@ -11,7 +11,7 @@ gulp.task("clean-assets-png", function() {
     .pipe(clean());
 });
 
-gulp.task("clean-assets-json", function() {
+gulp.task("clean-assets-json", () => {
   return gulp
     .src("build/*.json", {
       read: false
@@ -21,7 +21,7 @@ gulp.task("clean-assets-json", function() {
 
 gulp.task(
   "build-assets-png",
-  gulp.series("clean-assets-png", function() {
+  gulp.series("clean-assets-png", () => {
     return gulp
       .src("src/res/*.png")
       .pipe(imagemin({ progressive: true }))
@@ -31,7 +31,7 @@ gulp.task(
 
 gulp.task(
   "build-assets-json",
-  gulp.series("clean-assets-json", function() {
+  gulp.series("clean-assets-json", () => {
     return gulp
       .src("src/res/*.json")
       .pipe(jsonMinify())
@@ -46,11 +46,14 @@ gulp.task(
     gulp.parallel("build-assets-png", "build-assets-json")
   )
 );
-gulp.task("default", () => {
-  gulp.series("build-assets-dev", () => {
-    gulp.watch("src/res/*.*", gulp.series("build-assets-dev"));
-  })
-});
+
+gulp.task("default", 
+  gulp.series(
+    "build-assets-dev", 
+    () => {
+      return gulp.watch("src/res/*.*", gulp.series("build-assets-dev"));
+    }
+));
 
 gulp.task("prd-clean-assets-png", function() {
   return gulp
