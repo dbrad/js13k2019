@@ -28,6 +28,7 @@
     "gulp-json-minify": "^1.2.2",
     "html-inline": "^1.2.0",
     "mkdirp": "^0.5.1",
+    "parcel": "^1.12.3",
     "rimraf": "^2.6.3",
     "tslint": "^5.16.0",
     "typescript": "^3.4.5",
