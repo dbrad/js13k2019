@@ -57,44 +57,8 @@ export function init(canvas: HTMLCanvasElement): void {
   }
 
   const shader: WebGLShader = createShaderProgram(
-    `precision lowp float;                  
-                  
-      // IN Vertex Position and
-      // IN Texture Coordinates
-      attribute vec2 v, t;
-      
-      // IN Vertex Color
-      attribute vec4 c;
-      
-      // OUT Texture Coordinates
-      varying vec2 uv;
-      
-      // OUT Vertex Color
-      varying vec4 col;
-      
-      // CONST View Matrix
-      uniform mat4 m;
-      
-      void main() {
-          gl_Position = m * vec4(v, 1.0, 1.0);
-          uv = t;
-          col = c;
-      }
-      `,
-    `precision lowp float;
-      // OUT Texture Coordinates
-      varying vec2 uv;
-      
-      // OUT Vertex Color
-      varying vec4 col;
-      
-      // CONST Single Sampler2D
-      uniform sampler2D s;
-
-      void main() {
-        gl_FragColor = texture2D(s, uv) * col;
-      }
-      `
+    `precision lowp float;attribute vec2 v,t;attribute vec4 c;varying vec2 uv;varying vec4 col;uniform mat4 m;void main() {gl_Position = m * vec4(v, 1.0, 1.0);uv = t;col = c;}`,
+    `precision lowp float;varying vec2 uv;varying vec4 col;uniform sampler2D s;void main() {gl_FragColor = texture2D(s, uv) * col;}`
   );
 
   indexBuffer = createBuffer(gl.ELEMENT_ARRAY_BUFFER, vIndexData.byteLength, gl.STATIC_DRAW);

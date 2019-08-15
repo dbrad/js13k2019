@@ -1,12 +1,17 @@
-import { loadSpriteSheet } from "./assets";
+import { load } from "./assets";
+import { Align, drawText, drawTexture } from "./draw";
+import { subscribe } from "./events";
 import * as gl from "./gl";
+import * as mouse from "./mouse";
 import * as Stats from "./stats";
-import { Align, drawText } from "./text";
+import { V2 } from "./v2";
 
 let stats: typeof Stats;
 if (process.env.NODE_ENV === "development") {
   stats = require("./stats");
 }
+
+const cursor: V2 = new V2(400, 225);
 
 window.addEventListener("load", async (): Promise<any> => {
   let then: number = 0;
@@ -19,8 +24,15 @@ window.addEventListener("load", async (): Promise<any> => {
     drawText("theme: back", 5, 25, Align.LEFT, 2);
     drawText("(c) 2019 david brad", 5, 440, Align.LEFT, 1);
     
+    drawTexture("cursor", cursor.x, cursor.y);
     if (process.env.NODE_ENV === "development") {
       stats.tick(now, delta);
+    }
+    if(mouse.inputDisabled) {
+      gl.col(0xAA222222);
+      drawTexture("solid", 0, 0, 800, 450);
+      gl.col(0xFFFFFFFF);
+      drawText("click to focus game", 400, 225, Align.CENTER, 4);
     }
     gl.flush();
     requestAnimationFrame(tick);
@@ -52,8 +64,13 @@ window.addEventListener("load", async (): Promise<any> => {
   }
   
   gl.init(canvas);
-  await loadSpriteSheet("sheet.json");
-  
+  mouse.initialize(canvas);
+  await load("sheet.json");
+
+  subscribe("mousemove", "game", (pos: V2) => {
+    cursor.set(pos);
+  });
+
   requestAnimationFrame(tick);
   window.dispatchEvent(new Event("resize"));
 });

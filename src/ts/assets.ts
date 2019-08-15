@@ -27,7 +27,7 @@ type AssetJson = {
 export const ATLAS_STORE: Map<string, WebGLTexture> = new Map();
 export const TEXTURE_STORE: Map<string, Texture> = new Map();
 
-export async function loadSpriteSheet(url: string): Promise<{}> {
+export async function load(url: string): Promise<{}> {
   const response: Response = await fetch(url);
   const sheet: AssetJson = await response.json();
   const image: HTMLImageElement = new Image();

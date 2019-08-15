@@ -1,6 +1,15 @@
 import { Texture, TEXTURE_STORE } from "./assets";
 import * as gl from "./gl";
 
+export function drawTexture(textureName: string, x: number, y: number, sx: number = 1, sy: number = 1): void {
+  const t: Texture = TEXTURE_STORE.get(textureName);
+  gl.push();
+  gl.tran(x, y);
+  gl.scale(sx, sy);
+  gl.draw(t.atlas, 0, 0, t.w, t.h, t.u0, t.v0, t.u1, t.v1);
+  gl.pop();
+}
+
 export enum Align {
   LEFT,
   CENTER,
