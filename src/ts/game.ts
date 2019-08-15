@@ -1,16 +1,36 @@
-window.addEventListener("load", (): void => {
+import { loadSpriteSheet } from "./assets";
+import * as gl from "./gl";
+import * as Stats from "./stats";
+import { Align, drawText } from "./text";
+
+let stats: typeof Stats;
+if (process.env.NODE_ENV === "development") {
+  stats = require("./stats");
+}
+
+window.addEventListener("load", async (): Promise<any> => {
   let then: number = 0;
   function tick(now: number): void {
     const delta: number = now - then;
     then = now;
+
+    gl.cls();
+    drawText("js13k 2019", 5, 5, Align.LEFT, 3);
+    drawText("theme: back", 5, 25, Align.LEFT, 2);
+    drawText("(c) 2019 david brad", 5, 440, Align.LEFT, 1);
+    
+    if (process.env.NODE_ENV === "development") {
+      stats.tick(now, delta);
+    }
+    gl.flush();
     requestAnimationFrame(tick);
   }
 
   const stage: HTMLDivElement = document.querySelector("#stage");
   const canvas: HTMLCanvasElement = document.querySelector("canvas");
 
-  canvas.width = 640;
-  canvas.height = 480;
+  canvas.width = 800;
+  canvas.height = 450;
 
   window.addEventListener(
     "resize",
@@ -26,7 +46,14 @@ window.addEventListener("load", (): void => {
       stage.style.webkitTransform = rule;
     }
   );
-
+  
+  if (process.env.NODE_ENV === "development") {
+    stats.init();
+  }
+  
+  gl.init(canvas);
+  await loadSpriteSheet("sheet.json");
+  
   requestAnimationFrame(tick);
   window.dispatchEvent(new Event("resize"));
 });
