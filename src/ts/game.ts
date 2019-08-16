@@ -1,15 +1,10 @@
-import { load } from "./assets";
-import { Align, drawText, drawTexture } from "./draw";
-import { subscribe } from "./events";
-import * as gl from "./gl";
-import * as mouse from "./mouse";
-import * as Stats from "./stats";
-import { V2 } from "./v2";
-
-let stats: typeof Stats;
-if (process.env.NODE_ENV === "development") {
-  stats = require("./stats");
-}
+/// <reference path="./assets.ts" />
+/// <reference path="./draw.ts" />
+/// <reference path="./events.ts" />
+/// <reference path="./gl.ts" />
+/// <reference path="./mouse.ts" />
+/// <reference path="./stats.ts" />
+/// <reference path="./v2.ts" />
 
 const cursor: V2 = new V2(400, 225);
 

@@ -1,7 +1,7 @@
-import { Texture, TEXTURE_STORE } from "./assets";
-import * as gl from "./gl";
+/// <reference path="./gl.ts" />
+/// <reference path="./assets.ts" />
 
-export function drawTexture(textureName: string, x: number, y: number, sx: number = 1, sy: number = 1): void {
+function drawTexture(textureName: string, x: number, y: number, sx: number = 1, sy: number = 1): void {
   const t: Texture = TEXTURE_STORE.get(textureName);
   gl.push();
   gl.tran(x, y);
@@ -10,13 +10,13 @@ export function drawTexture(textureName: string, x: number, y: number, sx: numbe
   gl.pop();
 }
 
-export enum Align {
+enum Align {
   LEFT,
   CENTER,
   RIGHT
 }
 
-export function drawText(text: string, x: number, y: number, textAlign: Align = Align.LEFT, scale: number = 1, wrap: number = 0): void {
+function drawText(text: string, x: number, y: number, textAlign: Align = Align.LEFT, scale: number = 1, wrap: number = 0): void {
   const words: string[] = text.toLowerCase().split(" ");
   const orgx: number = x;
   let offx: number = 0;

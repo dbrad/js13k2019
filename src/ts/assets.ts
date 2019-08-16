@@ -1,6 +1,6 @@
-import { createTexture } from "./gl";
+/// <reference path="./gl.ts" />
 
-export type Texture = {
+type Texture = {
   atlas: WebGLTexture;
   w: number;
   h: number;
@@ -24,10 +24,10 @@ type AssetJson = {
   textures: TextureJson[];
 };
 
-export const ATLAS_STORE: Map<string, WebGLTexture> = new Map();
-export const TEXTURE_STORE: Map<string, Texture> = new Map();
+const ATLAS_STORE: Map<string, WebGLTexture> = new Map();
+const TEXTURE_STORE: Map<string, Texture> = new Map();
 
-export async function load(url: string): Promise<{}> {
+async function load(url: string): Promise<{}> {
   const response: Response = await fetch(url);
   const sheet: AssetJson = await response.json();
   const image: HTMLImageElement = new Image();
@@ -35,7 +35,7 @@ export async function load(url: string): Promise<{}> {
   return new Promise((resolve, reject) => {
     try {
       image.addEventListener("load", () => {
-        const glTexture: WebGLTexture = createTexture(image);
+        const glTexture: WebGLTexture = gl.createTexture(image);
         ATLAS_STORE.set(sheet.name, glTexture);
 
         for (const texture of sheet.textures) {
