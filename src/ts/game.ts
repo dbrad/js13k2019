@@ -6,7 +6,7 @@
 /// <reference path="./stats.ts" />
 /// <reference path="./v2.ts" />
 
-const cursor: V2 = new V2(400, 225);
+const cursor: V2 = { x: 400, y: 225 };
 
 window.addEventListener("load", async (): Promise<any> => {
   let then: number = 0;
@@ -18,12 +18,12 @@ window.addEventListener("load", async (): Promise<any> => {
     drawText("js13k 2019", 5, 5, Align.LEFT, 3);
     drawText("theme: back", 5, 25, Align.LEFT, 2);
     drawText("(c) 2019 david brad", 5, 440, Align.LEFT, 1);
-    
+
     drawTexture("cursor", cursor.x, cursor.y);
     if (process.env.NODE_ENV === "development") {
       stats.tick(now, delta);
     }
-    if(mouse.inputDisabled) {
+    if (mouse.inputDisabled) {
       gl.col(0xAA222222);
       drawTexture("solid", 0, 0, 800, 450);
       gl.col(0xFFFFFFFF);
@@ -53,17 +53,17 @@ window.addEventListener("load", async (): Promise<any> => {
       stage.style.webkitTransform = rule;
     }
   );
-  
+
   if (process.env.NODE_ENV === "development") {
     stats.init();
   }
-  
+
   gl.init(canvas);
   mouse.initialize(canvas);
   await load("sheet.json");
 
   subscribe("mousemove", "game", (pos: V2) => {
-    cursor.set(pos);
+    V2.set(cursor, pos);
   });
 
   requestAnimationFrame(tick);
