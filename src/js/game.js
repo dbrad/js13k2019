@@ -336,33 +336,23 @@ function emit(eventName, ...params) {
         setTimeout(handler, 0, ...params);
     }
 }
-class V2 {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+var V2;
+(function (V2) {
+    function copy(v2) {
+        return { x: v2.x, y: v2.y };
     }
-    copy() {
-        return new V2(this.x, this.y);
+    V2.copy = copy;
+    function set(a, b) {
+        a.x = b.x;
+        a.y = b.y;
     }
-    set(v2) {
-        this.x = v2.x;
-        this.y = v2.y;
-    }
-    equals(v2) {
-        return this.x === v2.x && this.y === v2.y;
-    }
-    hash() {
-        return (this.x * 7 + this.y * 3);
-    }
-    static add(v1, v2) {
-        return new V2(v1.x + v2.x, v1.y + v2.y);
-    }
-}
+    V2.set = set;
+})(V2 || (V2 = {}));
 /// <reference path="./v2.ts" />
 /// <reference path="./events.ts" />
 var mouse;
 (function (mouse) {
-    const position = new V2(400, 225);
+    const position = { x: 400, y: 225 };
     mouse.inputDisabled = true;
     let Buttons;
     (function (Buttons) {
@@ -379,7 +369,7 @@ var mouse;
             else if (!mouse.inputDisabled) {
                 if (handlers.has(event.button)) {
                     const fn = handlers.get(event.button);
-                    fn(position.copy());
+                    fn(V2.copy(position));
                 }
             }
         });
@@ -408,7 +398,7 @@ var mouse;
             }
             if (timer >= MOUSEMOVE_POLLING_RATE) {
                 timer = 0;
-                emit("mousemove", position.copy());
+                emit("mousemove", V2.copy(position));
             }
         }
         document.addEventListener("pointerlockchange", () => {
@@ -487,7 +477,7 @@ var stats;
 /// <reference path="./mouse.ts" />
 /// <reference path="./stats.ts" />
 /// <reference path="./v2.ts" />
-const cursor = new V2(400, 225);
+const cursor = { x: 400, y: 225 };
 window.addEventListener("load", () => __awaiter(this, void 0, void 0, function* () {
     let then = 0;
     function tick(now) {
@@ -532,7 +522,7 @@ window.addEventListener("load", () => __awaiter(this, void 0, void 0, function* 
     mouse.initialize(canvas);
     yield load("sheet.json");
     subscribe("mousemove", "game", (pos) => {
-        cursor.set(pos);
+        V2.set(cursor, pos);
     });
     requestAnimationFrame(tick);
     window.dispatchEvent(new Event("resize"));

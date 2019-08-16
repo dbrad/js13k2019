@@ -2,7 +2,7 @@
 /// <reference path="./events.ts" />
 
 namespace mouse {
-  const position: V2 = new V2(400, 225);
+  const position: V2 = { x: 400, y: 225 };
   export let inputDisabled: boolean = true;
   export enum Buttons {
     Primary,
@@ -19,7 +19,7 @@ namespace mouse {
       } else if (!inputDisabled) {
         if (handlers.has(event.button)) {
           const fn: clickHandler = handlers.get(event.button);
-          fn(position.copy());
+          fn(V2.copy(position));
         }
       }
     });
@@ -49,7 +49,7 @@ namespace mouse {
       }
       if (timer >= MOUSEMOVE_POLLING_RATE) {
         timer = 0;
-        emit("mousemove", position.copy());
+        emit("mousemove", V2.copy(position));
       }
     }
 
