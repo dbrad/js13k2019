@@ -11,7 +11,8 @@ type Texture = {
 };
 
 type TextureJson = {
-  name: string;
+  type: "sprite" | "row";
+  id: string|string[];
   x: number;
   y: number;
   w: number;
@@ -39,15 +40,30 @@ async function load(url: string): Promise<{}> {
         ATLAS_STORE.set(sheet.name, glTexture);
 
         for (const texture of sheet.textures) {
-          TEXTURE_STORE.set(texture.name, {
-            atlas: glTexture,
-            w: texture.w,
-            h: texture.h,
-            u0: texture.x / image.width,
-            v0: texture.y / image.height,
-            u1: (texture.x + texture.w) / image.width,
-            v1: (texture.y + texture.h) / image.height
-          });
+          if (texture.type === "sprite") {
+            TEXTURE_STORE.set(texture.id as string, {
+              atlas: glTexture,
+              w: texture.w,
+              h: texture.h,
+              u0: texture.x / image.width,
+              v0: texture.y / image.height,
+              u1: (texture.x + texture.w) / image.width,
+              v1: (texture.y + texture.h) / image.height
+            });
+          } else {
+            for(let ox: number = texture.x, i: number = 0; ox < image.width; ox += texture.w) {
+              TEXTURE_STORE.set(texture.id[i], {
+                atlas: glTexture,
+                w: texture.w,
+                h: texture.h,
+                u0: ox / image.width,
+                v0: texture.y / image.height,
+                u1: (ox + texture.w) / image.width,
+                v1: (texture.y + texture.h) / image.height
+              });
+              i++;
+            }
+          }
         }
         resolve();
       });
