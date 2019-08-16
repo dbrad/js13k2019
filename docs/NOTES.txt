@@ -1,1 +1,31 @@
 THEME: Back
+
+Generate a single line of encounter nodes
+  - Generate a tree of encounter nodes if time and space allow
+
+3-4 enemies to encounter
+colour based modifiers?
+- snakes (easy)
+- badgers (medium)
+- bears (hard)
+- wolves (hard)
+
+1-2 bosses
+- wendigo
+- sasquatch
+
+camps (heal)
+
+loot (get items)
+
+food counter? heal small amount after each encounter as long as there is food?
+  each encounter uses 1 food
+  no food for x turns starts to have consequences.
+items to modify encounters based on dice fed to them
+each encounter has intrinsic dice targets
+maybe have a hold mechanic? (reduces pure rng)
+injury mechanic (disables 1 die)
+bonus dice mechanic(s)? (items? buffs? well rested? well fed?)
+post encounter events, left over dice from last turn can be used on these to get food or other stuff to happen?
+cleared encounters become a safe space?
+  - can use items, forage for food, or get light rest once before moving on (uses 1 food?)
