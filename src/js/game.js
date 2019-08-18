@@ -481,10 +481,11 @@ var stats;
 /// <reference path="./stats.ts" />
 /// <reference path="./v2.ts" />
 const cursor = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
+let idGen = 0;
 class SceneNode {
     constructor() {
         this.children = new Map();
-        this.id = SceneNode.idGen++;
+        this.id = idGen++;
     }
     addChild(node) {
         this.children.set(node.id, node);
@@ -508,7 +509,6 @@ class SceneNode {
         }
     }
 }
-SceneNode.idGen = 0;
 class Button extends SceneNode {
     constructor(text, x, y, w, h, onClick, colourNormal, colourHover, colourPressed) {
         super();
