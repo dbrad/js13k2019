@@ -11,16 +11,28 @@ namespace mouse {
   }
   type clickHandler = (position: V2) => void;
   const handlers: Map<Buttons, clickHandler> = new Map();
+  let mouseDown: boolean = false;
 
   export function initialize(canvas: HTMLCanvasElement): void {
     canvas.addEventListener("click", (event: MouseEvent) => {
       if (document.pointerLockElement === null) {
         canvas.requestPointerLock();
       } else if (!inputDisabled) {
-        if (handlers.has(event.button)) {
-          const fn: clickHandler = handlers.get(event.button);
-          fn(V2.copy(position));
-        }
+        emit("mouseclick", V2.copy(position));
+      }
+    });
+
+    canvas.addEventListener("mousedown", () => {
+      if (!inputDisabled) {
+        mouseDown = true;
+        emit("mousedown", V2.copy(position));
+      }
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      if (!inputDisabled) {
+        mouseDown = false;
+        emit("mouseup", V2.copy(position));
       }
     });
 
@@ -49,7 +61,7 @@ namespace mouse {
       }
       if (timer >= MOUSEMOVE_POLLING_RATE) {
         timer = 0;
-        emit("mousemove", V2.copy(position));
+        emit("mousemove", V2.copy(position), mouseDown);
       }
     }
 
@@ -62,17 +74,5 @@ namespace mouse {
         inputDisabled = true;
       }
     }, false);
-  }
-
-  export function bind(button: Buttons, handler: (position: V2) => void): void {
-    handlers.set(button, handler);
-  }
-
-  export function unbind(button: Buttons): void {
-    handlers.delete(button);
-  }
-
-  export function unbindAll(): void {
-    handlers.clear();
   }
 }

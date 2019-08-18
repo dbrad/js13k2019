@@ -19,7 +19,9 @@ function unsubscribeAll(eventName: string): void {
 
 function emit(eventName: string, ...params: any[]): void {
   const handlers: Map<string, EventHandler> = events.get(eventName);
-  for (const [observerName, handler] of handlers) {
-    setTimeout(handler, 0, ...params);
+  if (handlers) {
+    for (const [observerName, handler] of handlers) {
+      setTimeout(handler, 0, ...params);
+    }
   }
 }

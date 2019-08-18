@@ -1,3 +1,5 @@
+const SCREEN_WIDTH = 800;
+const SCREEN_HEIGHT = 450;
 var gl;
 (function (gl) {
     let ctx;
@@ -332,8 +334,10 @@ function unsubscribeAll(eventName) {
 }
 function emit(eventName, ...params) {
     const handlers = events.get(eventName);
-    for (const [observerName, handler] of handlers) {
-        setTimeout(handler, 0, ...params);
+    if (handlers) {
+        for (const [observerName, handler] of handlers) {
+            setTimeout(handler, 0, ...params);
+        }
     }
 }
 var V2;
@@ -361,16 +365,26 @@ var mouse;
         Buttons[Buttons["Secondary"] = 2] = "Secondary";
     })(Buttons = mouse.Buttons || (mouse.Buttons = {}));
     const handlers = new Map();
+    let mouseDown = false;
     function initialize(canvas) {
         canvas.addEventListener("click", (event) => {
             if (document.pointerLockElement === null) {
                 canvas.requestPointerLock();
             }
             else if (!mouse.inputDisabled) {
-                if (handlers.has(event.button)) {
-                    const fn = handlers.get(event.button);
-                    fn(V2.copy(position));
-                }
+                emit("mouseclick", V2.copy(position));
+            }
+        });
+        canvas.addEventListener("mousedown", () => {
+            if (!mouse.inputDisabled) {
+                mouseDown = true;
+                emit("mousedown", V2.copy(position));
+            }
+        });
+        canvas.addEventListener("mouseup", () => {
+            if (!mouse.inputDisabled) {
+                mouseDown = false;
+                emit("mouseup", V2.copy(position));
             }
         });
         const MOUSEMOVE_POLLING_RATE = 1000 / 60;
@@ -398,7 +412,7 @@ var mouse;
             }
             if (timer >= MOUSEMOVE_POLLING_RATE) {
                 timer = 0;
-                emit("mousemove", V2.copy(position));
+                emit("mousemove", V2.copy(position), mouseDown);
             }
         }
         document.addEventListener("pointerlockchange", () => {
@@ -413,18 +427,6 @@ var mouse;
         }, false);
     }
     mouse.initialize = initialize;
-    function bind(button, handler) {
-        handlers.set(button, handler);
-    }
-    mouse.bind = bind;
-    function unbind(button) {
-        handlers.delete(button);
-    }
-    mouse.unbind = unbind;
-    function unbindAll() {
-        handlers.clear();
-    }
-    mouse.unbindAll = unbindAll;
 })(mouse || (mouse = {}));
 var stats;
 (function (stats) {
@@ -470,6 +472,7 @@ var stats;
     }
     stats.tick = tick;
 })(stats || (stats = {}));
+/// <reference path="./consts.ts" />
 /// <reference path="./assets.ts" />
 /// <reference path="./draw.ts" />
 /// <reference path="./events.ts" />
@@ -477,33 +480,143 @@ var stats;
 /// <reference path="./mouse.ts" />
 /// <reference path="./stats.ts" />
 /// <reference path="./v2.ts" />
-const cursor = { x: 400, y: 225 };
+const cursor = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
+class SceneNode {
+    constructor() {
+        this.children = new Map();
+        this.id = SceneNode.idGen++;
+    }
+    addChild(node) {
+        this.children.set(node.id, node);
+    }
+    removeChild(node) {
+        this.children.delete(node.id);
+    }
+    destroy() {
+        for (const [id, node] of this.children) {
+            node.destroy();
+        }
+    }
+    update(delta) {
+        for (const [id, node] of this.children) {
+            node.update(delta);
+        }
+    }
+    draw(delta) {
+        for (const [id, node] of this.children) {
+            node.draw(delta);
+        }
+    }
+}
+SceneNode.idGen = 0;
+class Button extends SceneNode {
+    constructor(text, x, y, w, h, onClick, colourNormal, colourHover, colourPressed) {
+        super();
+        this.enabled = true;
+        this.colour = 0xFFFF4444;
+        this.colourNormal = 0xFFFF4444;
+        this.colourHover = 0xFFFF5555;
+        this.colourPressed = 0xFFFF1111;
+        this.text = text;
+        this.positon = { x, y };
+        this.size = { x: w, y: h };
+        this.onClick = onClick;
+        this.colourNormal = colourNormal;
+        this.colourHover = colourHover;
+        this.colourPressed = colourPressed;
+        subscribe("mousemove", `button_${this.id}`, (pos, mousedown) => {
+            if (this.enabled && !mousedown) {
+                if (pos.x >= this.positon.x && pos.x <= this.positon.x + this.size.x &&
+                    pos.y >= this.positon.y && pos.y <= this.positon.y + this.size.y) {
+                    this.colour = this.colourHover;
+                }
+                else {
+                    this.colour = this.colourNormal;
+                }
+            }
+        });
+        subscribe("mousedown", `button_${this.id}`, (pos) => {
+            if (this.enabled) {
+                if (pos.x >= this.positon.x && pos.x <= this.positon.x + this.size.x &&
+                    pos.y >= this.positon.y && pos.y <= this.positon.y + this.size.y) {
+                    this.colour = this.colourPressed;
+                }
+            }
+        });
+        subscribe("mouseup", `button_${this.id}`, (pos) => {
+            if (this.enabled) {
+                if (pos.x >= this.positon.x && pos.x <= this.positon.x + this.size.x &&
+                    pos.y >= this.positon.y && pos.y <= this.positon.y + this.size.y) {
+                    this.enabled = false;
+                    this.onClick();
+                    this.colour = this.colourHover;
+                    this.enabled = true;
+                }
+                else {
+                    this.colour = this.colourNormal;
+                }
+            }
+        });
+    }
+    destroy() {
+        unsubscribe("mousemove", `button_${this.id}`);
+        unsubscribe("mousedown", `button_${this.id}`);
+        unsubscribe("mouseup", `button_${this.id}`);
+    }
+    draw(delta) {
+        gl.col(this.colour);
+        drawTexture("solid", this.positon.x, this.positon.y, this.size.x, this.size.y);
+        gl.col(0XFFFFFFFF);
+        drawText(this.text, this.positon.x + ~~(this.size.x / 2), this.positon.y - 2 + ~~(this.size.y / 2), Align.CENTER, 1);
+        super.draw(delta);
+    }
+}
+class Dice extends SceneNode {
+    roll() {
+    }
+    draw() {
+    }
+}
+class DiceTray extends SceneNode {
+}
+class ActionSlot extends SceneNode {
+}
+class ActionCard extends SceneNode {
+}
 window.addEventListener("load", () => __awaiter(this, void 0, void 0, function* () {
+    const scene = new SceneNode();
+    const button = new Button("start game", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 20, 200, 40, () => {
+        alert("No game here yet friend.");
+    }, 0xFF444444, 0xff666666, 0xff222222);
+    button.size = { x: 200, y: 40 };
+    scene.addChild(button);
     let then = 0;
     function tick(now) {
         const delta = now - then;
         then = now;
+        scene.update(delta);
         gl.cls();
         drawText("js13k 2019", 5, 5, Align.LEFT, 3);
         drawText("theme: back", 5, 25, Align.LEFT, 2);
         drawText("(c) 2019 david brad", 5, 440, Align.LEFT, 1);
+        scene.draw(delta);
         drawTexture("cursor", cursor.x, cursor.y);
         if (process.env.NODE_ENV === "development") {
             stats.tick(now, delta);
         }
         if (mouse.inputDisabled) {
             gl.col(0xAA222222);
-            drawTexture("solid", 0, 0, 800, 450);
+            drawTexture("solid", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
             gl.col(0xFFFFFFFF);
-            drawText("click to focus game", 400, 225, Align.CENTER, 4);
+            drawText("click to focus game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, Align.CENTER, 4);
         }
         gl.flush();
         requestAnimationFrame(tick);
     }
     const stage = document.querySelector("#stage");
     const canvas = document.querySelector("canvas");
-    canvas.width = 800;
-    canvas.height = 450;
+    canvas.width = SCREEN_WIDTH;
+    canvas.height = SCREEN_HEIGHT;
     window.addEventListener("resize", () => {
         const scaleX = window.innerWidth / canvas.width;
         const scaleY = window.innerHeight / canvas.height;
