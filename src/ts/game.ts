@@ -8,9 +8,9 @@
 /// <reference path="./v2.ts" />
 
 const cursor: V2 = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
+let idGen: number = 0;
 
 class SceneNode {
-  private static idGen: number = 0;
   public id: number;
   public parent: SceneNode;
   public children: Map<number, SceneNode> = new Map();
@@ -18,7 +18,7 @@ class SceneNode {
   public size: V2;
 
   constructor() {
-    this.id = SceneNode.idGen++;
+    this.id = idGen++;
   }
 
   public addChild(node: SceneNode): void {
