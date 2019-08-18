@@ -67,8 +67,7 @@
     ],
     "class-name": true,
     "interface-name": [
-      true,
-      "always-prefix"
+      false
     ],
     "no-consecutive-blank-lines": true,
     "one-line": [

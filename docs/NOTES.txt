@@ -1,1 +1,76 @@
 THEME: Back
+Generate a single line of encounter nodes
+  - Generate a tree of encounter nodes if time and space allow
+
+3-4 enemies to encounter
+colour based modifiers?
+- snakes (easy)
+- badgers (medium)
+- bears (hard)
+- wolves (hard)
+
+1-2 bosses
+- wendigo
+- sasquatch
+
+camps (heal)
+
+loot (get items)
+
+food counter? heal small amount after each encounter as long as there is food?
+  each encounter uses 1 food
+  no food for x encounters starts to have consequences.
+  cannot backtrack without food
+items to modify encounters based on dice fed to them
+    weapon to do more dmg
+    shield to block incoming dmg
+    medkit to heal / remove injuries
+each encounter has intrinsic dice targets
+maybe have a hold mechanic? (reduces rng)
+    items that adds more hold slots
+injury mechanic (disables die)
+bonus dice mechanic(s)? (items? buffs? well rested? well fed?)
+post encounter events, left over dice from last turn can be used on these to get food or other stuff to happens?
+cleared encounters become a safe space?
+    safe spaces are also an encounter with a single dice roll, and events to plug into
+    can use items, forage for food, or get light rest once before moving on (uses 1 food?)
+
+Clickable
+Button
+Draggable
+Die
+Die targets
+  ranges
+  greater than
+  less than
+  countdown
+  exact
+  pairs?
+
+stats
+    food
+    hp
+    organisation (bag slots)
+    forthought (+1 dice hold)
+    "dice slots"
+    start with 6 standard dice
+    attributes / personalities to change dice?
+        i.e. risk/reward, 50:50 to get 1 or 6
+        i.e. even stevens, 2,4,6 only
+        i.e. at odds 1,3,5 only
+
+Classes
+=======
+Clickable
+Button : Clickable
+Draggable : Clickable
+Die : Draggable
+Action : Droppable
+ComparisonAction : Action (< <= == >= >)
+RangesAction : Action
+CountDownAction : Action
+
+
+ActionQueue
+
+https://opengameart.org/content/animated-snake
