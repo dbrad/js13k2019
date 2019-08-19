@@ -141,16 +141,26 @@ class ActionCard extends SceneNode {
   public onDrop: () => void;
 }
 
+let buttonTester: string = "";
+
 window.addEventListener("load", async (): Promise<any> => {
   const scene: SceneNode = new SceneNode();
   const button: Button = new Button(
-    "start game", 
-    SCREEN_WIDTH / 2 - 100, 
+    "start game",
+    SCREEN_WIDTH / 2 - 100,
     SCREEN_HEIGHT / 2 - 20,
     200,
     40,
     () => {
-      alert("No game here yet friend.");
+      if (buttonTester === "" || buttonTester === "Nothing to see here.") {
+        buttonTester = "Stop it.";
+      }
+      else if (buttonTester === "Stop it.") {
+        buttonTester = "The button works, okay?";
+      }
+      else {
+        buttonTester = "Nothing to see here.";
+      }
     },
     0xFF444444,
     0xff666666,
@@ -168,7 +178,7 @@ window.addEventListener("load", async (): Promise<any> => {
     gl.cls();
     drawText("js13k 2019", 5, 5, Align.LEFT, 3);
     drawText("theme: back", 5, 25, Align.LEFT, 2);
-    drawText("(c) 2019 david brad", 5, 440, Align.LEFT, 1);
+    drawText(`(c) 2019 david brad ${buttonTester !== "" ? " - " : ""} ${buttonTester}`, 5, 440, Align.LEFT, 1);
 
     scene.draw(delta);
 

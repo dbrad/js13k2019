@@ -583,10 +583,19 @@ class ActionSlot extends SceneNode {
 }
 class ActionCard extends SceneNode {
 }
+let buttonTester = "";
 window.addEventListener("load", () => __awaiter(this, void 0, void 0, function* () {
     const scene = new SceneNode();
     const button = new Button("start game", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 20, 200, 40, () => {
-        alert("No game here yet friend.");
+        if (buttonTester === "" || buttonTester === "Nothing to see here.") {
+            buttonTester = "Stop it.";
+        }
+        else if (buttonTester === "Stop it.") {
+            buttonTester = "The button works, okay?";
+        }
+        else {
+            buttonTester = "Nothing to see here.";
+        }
     }, 0xFF444444, 0xff666666, 0xff222222);
     button.size = { x: 200, y: 40 };
     scene.addChild(button);
@@ -598,7 +607,7 @@ window.addEventListener("load", () => __awaiter(this, void 0, void 0, function* 
         gl.cls();
         drawText("js13k 2019", 5, 5, Align.LEFT, 3);
         drawText("theme: back", 5, 25, Align.LEFT, 2);
-        drawText("(c) 2019 david brad", 5, 440, Align.LEFT, 1);
+        drawText(`(c) 2019 david brad ${buttonTester !== "" ? " - " : ""} ${buttonTester}`, 5, 440, Align.LEFT, 1);
         scene.draw(delta);
         drawTexture("cursor", cursor.x, cursor.y);
         if (process.env.NODE_ENV === "development") {
