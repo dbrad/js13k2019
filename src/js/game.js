@@ -472,15 +472,6 @@ var stats;
     }
     stats.tick = tick;
 })(stats || (stats = {}));
-/// <reference path="./consts.ts" />
-/// <reference path="./assets.ts" />
-/// <reference path="./draw.ts" />
-/// <reference path="./events.ts" />
-/// <reference path="./gl.ts" />
-/// <reference path="./mouse.ts" />
-/// <reference path="./stats.ts" />
-/// <reference path="./v2.ts" />
-const cursor = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
 let idGen = 0;
 class SceneNode {
     constructor() {
@@ -509,6 +500,11 @@ class SceneNode {
         }
     }
 }
+/// <reference path="./events.ts" />
+/// <reference path="./v2.ts" />
+/// <reference path="./gl.ts" />
+/// <reference path="./draw.ts" />
+/// <reference path="./scene-node.ts" />
 class Button extends SceneNode {
     constructor(text, x, y, w, h, onClick, colourNormal, colourHover, colourPressed) {
         super();
@@ -571,6 +567,17 @@ class Button extends SceneNode {
         super.draw(delta);
     }
 }
+/// <reference path="./consts.ts" />
+/// <reference path="./assets.ts" />
+/// <reference path="./draw.ts" />
+/// <reference path="./events.ts" />
+/// <reference path="./gl.ts" />
+/// <reference path="./mouse.ts" />
+/// <reference path="./stats.ts" />
+/// <reference path="./button.ts" />
+/// <reference path="./scene-node.ts" />
+/// <reference path="./v2.ts" />
+const cursor = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
 class Dice extends SceneNode {
     roll() {
     }
