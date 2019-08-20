@@ -5,11 +5,10 @@
 /// <reference path="./gl.ts" />
 /// <reference path="./mouse.ts" />
 /// <reference path="./stats.ts" />
-/// <reference path="./button.ts" />
+/// <reference path="./scene.ts" />
 /// <reference path="./scene-node.ts" />
 /// <reference path="./v2.ts" />
-
-const cursor: V2 = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
+/// <reference path="./main-menu.ts" />
 
 class Dice extends SceneNode {
   public values: number[];
@@ -36,56 +35,29 @@ class ActionCard extends SceneNode {
   public onDrop: () => void;
 }
 
-let buttonTester: string = "";
-
 type GameState = {
   food: number;
   hp: number;
 };
 
-window.addEventListener("load", async (): Promise<any> => {
-  const scene: SceneNode = new SceneNode();
-  const button: Button = new Button(
-    "start game",
-    SCREEN_WIDTH / 2 - 100,
-    SCREEN_HEIGHT / 2 - 20,
-    200,
-    40,
-    () => {
-      if (buttonTester === "" || buttonTester === "Nothing to see here.") {
-        buttonTester = "Stop it.";
-      }
-      else if (buttonTester === "Stop it.") {
-        buttonTester = "The button works, okay?";
-      }
-      else {
-        buttonTester = "Nothing to see here.";
-      }
-    },
-    0xFF444444,
-    0xff666666,
-    0xff222222);
-  button.size = { x: 200, y: 40 };
-  scene.addChild(button);
+SceneManager.register(mainMenu);
+SceneManager.push(mainMenu.name);
 
+window.addEventListener("load", async (): Promise<any> => {
   let then: number = 0;
   function tick(now: number): void {
     const delta: number = now - then;
     then = now;
 
-    scene.update(delta);
+    SceneManager.update(delta);
 
     gl.cls();
-    drawText("js13k 2019", 5, 5, Align.LEFT, 3);
-    drawText("theme: back", 5, 25, Align.LEFT, 2);
-    drawText(`(c) 2019 david brad ${buttonTester !== "" ? " - " : ""} ${buttonTester}`, 5, 440, Align.LEFT, 1);
+    SceneManager.draw(delta);
 
-    scene.draw(delta);
-
-    drawTexture("cursor", cursor.x, cursor.y);
     if (process.env.NODE_ENV === "development") {
       stats.tick(now, delta);
     }
+
     if (mouse.inputDisabled) {
       gl.col(0xAA222222);
       drawTexture("solid", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -124,10 +96,6 @@ window.addEventListener("load", async (): Promise<any> => {
   gl.init(canvas);
   mouse.initialize(canvas);
   await load("sheet.json");
-
-  subscribe("mousemove", "game", (pos: V2) => {
-    V2.set(cursor, pos);
-  });
 
   requestAnimationFrame(tick);
   window.dispatchEvent(new Event("resize"));
