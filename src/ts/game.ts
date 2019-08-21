@@ -1,39 +1,11 @@
 /// <reference path="./consts.ts" />
+/// <reference path="./gl.ts" />
 /// <reference path="./assets.ts" />
 /// <reference path="./draw.ts" />
-/// <reference path="./events.ts" />
-/// <reference path="./gl.ts" />
 /// <reference path="./mouse.ts" />
 /// <reference path="./stats.ts" />
 /// <reference path="./scene.ts" />
-/// <reference path="./scene-node.ts" />
-/// <reference path="./v2.ts" />
-/// <reference path="./main-menu.ts" />
-
-class Dice extends SceneNode {
-  public values: number[];
-  public onClick: () => void;
-  public parent: ActionSlot | DiceTray;
-  public roll(): void {
-
-  }
-  public draw(): void {
-
-  }
-}
-
-class DiceTray extends SceneNode {
-  public onDrop: () => void;
-}
-
-class ActionSlot extends SceneNode {
-  public parent: ActionCard;
-  public onDrop: () => void;
-}
-
-class ActionCard extends SceneNode {
-  public onDrop: () => void;
-}
+/// <reference path="./main-menu-scene.ts" />
 
 type GameState = {
   food: number;
@@ -58,12 +30,14 @@ window.addEventListener("load", async (): Promise<any> => {
       stats.tick(now, delta);
     }
 
+    // if we lose mouse focus, put up an overlay
     if (mouse.inputDisabled) {
       gl.col(0xAA222222);
       drawTexture("solid", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
       gl.col(0xFFFFFFFF);
       drawText("click to focus game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, Align.CENTER, 4);
     }
+
     gl.flush();
     requestAnimationFrame(tick);
   }

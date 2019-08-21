@@ -22,6 +22,7 @@ class SceneNode {
   public destroy(): void {
     for (const [id, node] of this.children) {
       node.destroy();
+      this.children.delete(id);
     }
   }
 
