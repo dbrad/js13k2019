@@ -319,6 +319,18 @@ function drawText(text, x, y, textAlign = Align.LEFT, scale = 1, wrap = 0) {
         offx += 6 * scale;
     }
 }
+var V2;
+(function (V2) {
+    function copy(v2) {
+        return { x: v2.x, y: v2.y };
+    }
+    V2.copy = copy;
+    function set(a, b) {
+        a.x = b.x;
+        a.y = b.y;
+    }
+    V2.set = set;
+})(V2 || (V2 = {}));
 const events = new Map();
 function subscribe(eventName, observerName, handler) {
     if (!events.has(eventName)) {
@@ -340,18 +352,6 @@ function emit(eventName, ...params) {
         }
     }
 }
-var V2;
-(function (V2) {
-    function copy(v2) {
-        return { x: v2.x, y: v2.y };
-    }
-    V2.copy = copy;
-    function set(a, b) {
-        a.x = b.x;
-        a.y = b.y;
-    }
-    V2.set = set;
-})(V2 || (V2 = {}));
 /// <reference path="./v2.ts" />
 /// <reference path="./events.ts" />
 var mouse;
@@ -472,15 +472,6 @@ var stats;
     }
     stats.tick = tick;
 })(stats || (stats = {}));
-/// <reference path="./consts.ts" />
-/// <reference path="./assets.ts" />
-/// <reference path="./draw.ts" />
-/// <reference path="./events.ts" />
-/// <reference path="./gl.ts" />
-/// <reference path="./mouse.ts" />
-/// <reference path="./stats.ts" />
-/// <reference path="./v2.ts" />
-const cursor = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
 let idGen = 0;
 class SceneNode {
     constructor() {
@@ -496,6 +487,7 @@ class SceneNode {
     destroy() {
         for (const [id, node] of this.children) {
             node.destroy();
+            this.children.delete(id);
         }
     }
     update(delta) {
@@ -509,6 +501,83 @@ class SceneNode {
         }
     }
 }
+/// <reference path="./scene-node.ts" />
+var SceneManager;
+(function (SceneManager) {
+    const scenes = new Map();
+    const stack = [];
+    function register(scene) {
+        scenes.set(scene.name, scene);
+    }
+    SceneManager.register = register;
+    function push(name) {
+        const newScene = scenes.get(name);
+        if (stack.length > 0) {
+            stack[stack.length - 1].transitionOut();
+        }
+        stack.push(newScene);
+        stack[stack.length - 1].transitionIn();
+    }
+    SceneManager.push = push;
+    function pop() {
+        stack[stack.length - 1].transitionOut();
+        stack.pop();
+        if (stack.length > 0) {
+            stack[stack.length - 1].transitionIn();
+        }
+    }
+    SceneManager.pop = pop;
+    function update(delta) {
+        stack[stack.length - 1].update(delta);
+    }
+    SceneManager.update = update;
+    function draw(delta) {
+        stack[stack.length - 1].draw(delta);
+    }
+    SceneManager.draw = draw;
+})(SceneManager || (SceneManager = {}));
+const cursor = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
+class Scene {
+    constructor(name, transitionIn = null, transitionOut = null, update = null, draw = null) {
+        this.rootNode = new SceneNode();
+        this.transitionInFn = transitionIn;
+        this.transitionOutFn = transitionOut;
+        this.updateFn = update;
+        this.drawFn = draw;
+    }
+    transitionIn() {
+        if (this.transitionInFn) {
+            this.transitionInFn();
+        }
+        subscribe("mousemove", this.name, (pos) => {
+            V2.set(cursor, pos);
+        });
+    }
+    transitionOut() {
+        if (this.transitionOutFn) {
+            this.transitionOutFn();
+        }
+        unsubscribe("mousemove", this.name);
+    }
+    update(delta) {
+        if (this.updateFn) {
+            this.updateFn(delta);
+        }
+        this.rootNode.update(delta);
+    }
+    draw(delta) {
+        if (this.drawFn) {
+            this.drawFn(delta);
+        }
+        this.rootNode.draw(delta);
+        drawTexture("cursor", cursor.x, cursor.y);
+    }
+}
+/// <reference path="./events.ts" />
+/// <reference path="./v2.ts" />
+/// <reference path="./gl.ts" />
+/// <reference path="./draw.ts" />
+/// <reference path="./scene-node.ts" />
 class Button extends SceneNode {
     constructor(text, x, y, w, h, onClick, colourNormal, colourHover, colourPressed) {
         super();
@@ -571,48 +640,160 @@ class Button extends SceneNode {
         super.draw(delta);
     }
 }
-class Dice extends SceneNode {
-    roll() {
+/// <reference path="./scene-node.ts" />
+/// <reference path="./assets.ts" />
+/// <reference path="./draw.ts" />
+/// <reference path="./v2.ts" />
+function* Interpolator(duration, easingFn = (t) => t) {
+    const start = yield 0;
+    let now = start;
+    while (now - start < duration) {
+        const val = easingFn((now - start) / duration);
+        now = yield val;
     }
-    draw() {
+    if (now - start >= duration) {
+        return 1;
     }
 }
-class DiceTray extends SceneNode {
+function movement(origin, destination, duration) {
+    // TODO: return a function that uses an Interpolator to get from origin to dest
 }
-class ActionSlot extends SceneNode {
-}
-class ActionCard extends SceneNode {
-}
-let buttonTester = "";
-window.addEventListener("load", () => __awaiter(this, void 0, void 0, function* () {
-    const scene = new SceneNode();
-    const button = new Button("start game", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 20, 200, 40, () => {
-        if (buttonTester === "" || buttonTester === "Nothing to see here.") {
-            buttonTester = "Stop it.";
-        }
-        else if (buttonTester === "Stop it.") {
-            buttonTester = "The button works, okay?";
+class Sprite extends SceneNode {
+    constructor(frames, position, scale) {
+        super();
+        this.interp = null;
+        this.progress = 0;
+        this.loop = false;
+        this.durationTimer = -1;
+        this.frames = frames;
+        this.positon = V2.copy(position);
+        this.size = V2.copy(scale);
+    }
+    moveTo(v2) {
+        // TODO: want to kick off a linear interp for movement
+    }
+    destroy() {
+        // TODO: atte,pt to prep sprite for GC
+    }
+    get currentFrame() {
+        if (this.duration === 0) {
+            return this.frames[0];
         }
         else {
-            buttonTester = "Nothing to see here.";
+            let totalDuration = 0;
+            for (const frame of this.frames) {
+                totalDuration += frame.duration;
+                if (this.progress <= totalDuration) {
+                    return frame;
+                }
+            }
+            return this.frames[this.frames.length - 1];
         }
-    }, 0xFF444444, 0xff666666, 0xff222222);
-    button.size = { x: 200, y: 40 };
-    scene.addChild(button);
+    }
+    get duration() {
+        if (this.durationTimer === -1) {
+            this.durationTimer = 0;
+            for (const frame of this.frames) {
+                this.durationTimer += frame.duration;
+            }
+        }
+        return this.durationTimer;
+    }
+    update(delta) {
+        // TODO: interp movement
+        if (this.duration === 0) {
+            return;
+        }
+        else {
+            this.progress += delta;
+            if (this.progress > this.duration) {
+                if (this.loop) {
+                    this.progress = 0;
+                }
+                else {
+                    this.progress = 0;
+                }
+            }
+        }
+    }
+    draw(delta) {
+        drawTexture(this.currentFrame.textureName, this.positon.x, this.positon.y, this.size.x, this.size.y);
+    }
+}
+/// <reference path="./button.ts" />
+/// <reference path="./consts.ts" />
+/// <reference path="./scene.ts" />
+/// <reference path="./sprite.ts" />
+let buttonTester = "";
+const button = new Button("start game", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 20, 200, 40, () => {
+    if (buttonTester === "" || buttonTester === "Nothing to see here.") {
+        buttonTester = "Stop it.";
+    }
+    else if (buttonTester === "Stop it.") {
+        buttonTester = "The button works, okay?";
+    }
+    else {
+        buttonTester = "Nothing to see here.";
+    }
+}, 0xFF444444, 0xff666666, 0xff222222);
+const guy1 = new Sprite([
+    { textureName: "g_0", duration: 250 },
+    { textureName: "g_1", duration: 250 }
+], { x: SCREEN_WIDTH / 2 - 117, y: SCREEN_HEIGHT / 2 - 16 }, { x: 1, y: 1 });
+const guy2 = new Sprite([
+    { textureName: "g_0", duration: 250 },
+    { textureName: "g_1", duration: 250 }
+], { x: SCREEN_WIDTH / 2 - (117 + 33), y: SCREEN_HEIGHT / 2 - 32 }, { x: 2, y: 2 });
+const guy3 = new Sprite([
+    { textureName: "g_0", duration: 250 },
+    { textureName: "g_1", duration: 250 }
+], { x: SCREEN_WIDTH / 2 - (117 + 33 + 49), y: SCREEN_HEIGHT / 2 - 48 }, { x: 3, y: 3 });
+const snake1 = new Sprite([
+    { textureName: "s_0", duration: 250 },
+    { textureName: "s_1", duration: 250 }
+], { x: SCREEN_WIDTH / 2 + 101, y: SCREEN_HEIGHT / 2 - 16 }, { x: 1, y: 1 });
+const snake2 = new Sprite([
+    { textureName: "s_0", duration: 250 },
+    { textureName: "s_1", duration: 250 }
+], { x: SCREEN_WIDTH / 2 + (101 + 17), y: SCREEN_HEIGHT / 2 - 32 }, { x: 2, y: 2 });
+const snake3 = new Sprite([
+    { textureName: "s_0", duration: 250 },
+    { textureName: "s_1", duration: 250 }
+], { x: SCREEN_WIDTH / 2 + (101 + 17 + 33), y: SCREEN_HEIGHT / 2 - 48 }, { x: 3, y: 3 });
+const mainMenu = new Scene("MainMenu", () => { }, () => { }, (delta) => { }, (delta) => {
+    drawText("js13k 2019", 5, 5, Align.LEFT, 3);
+    drawText("theme: back", 5, 25, Align.LEFT, 2);
+    drawText(`(c) 2019 david brad ${buttonTester !== "" ? " - " : ""} ${buttonTester}`, 5, 440, Align.LEFT, 1);
+});
+mainMenu.rootNode.addChild(button);
+mainMenu.rootNode.addChild(guy1);
+mainMenu.rootNode.addChild(guy2);
+mainMenu.rootNode.addChild(guy3);
+mainMenu.rootNode.addChild(snake1);
+mainMenu.rootNode.addChild(snake2);
+mainMenu.rootNode.addChild(snake3);
+/// <reference path="./consts.ts" />
+/// <reference path="./gl.ts" />
+/// <reference path="./assets.ts" />
+/// <reference path="./draw.ts" />
+/// <reference path="./mouse.ts" />
+/// <reference path="./stats.ts" />
+/// <reference path="./scene.ts" />
+/// <reference path="./main-menu-scene.ts" />
+SceneManager.register(mainMenu);
+SceneManager.push(mainMenu.name);
+window.addEventListener("load", () => __awaiter(this, void 0, void 0, function* () {
     let then = 0;
     function tick(now) {
         const delta = now - then;
         then = now;
-        scene.update(delta);
+        SceneManager.update(delta);
         gl.cls();
-        drawText("js13k 2019", 5, 5, Align.LEFT, 3);
-        drawText("theme: back", 5, 25, Align.LEFT, 2);
-        drawText(`(c) 2019 david brad ${buttonTester !== "" ? " - " : ""} ${buttonTester}`, 5, 440, Align.LEFT, 1);
-        scene.draw(delta);
-        drawTexture("cursor", cursor.x, cursor.y);
+        SceneManager.draw(delta);
         if (process.env.NODE_ENV === "development") {
             stats.tick(now, delta);
         }
+        // if we lose mouse focus, put up an overlay
         if (mouse.inputDisabled) {
             gl.col(0xAA222222);
             drawTexture("solid", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -643,9 +824,6 @@ window.addEventListener("load", () => __awaiter(this, void 0, void 0, function* 
     gl.init(canvas);
     mouse.initialize(canvas);
     yield load("sheet.json");
-    subscribe("mousemove", "game", (pos) => {
-        V2.set(cursor, pos);
-    });
     requestAnimationFrame(tick);
     window.dispatchEvent(new Event("resize"));
 }));
