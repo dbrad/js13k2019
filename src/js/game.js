@@ -540,6 +540,7 @@ const cursor = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
 class Scene {
     constructor(name, transitionIn = null, transitionOut = null, update = null, draw = null) {
         this.rootNode = new SceneNode();
+        this.name = name;
         this.transitionInFn = transitionIn;
         this.transitionOutFn = transitionOut;
         this.updateFn = update;
@@ -724,17 +725,15 @@ class Sprite extends SceneNode {
 /// <reference path="./consts.ts" />
 /// <reference path="./scene.ts" />
 /// <reference path="./sprite.ts" />
-let buttonTester = "";
-const button = new Button("start game", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 20, 200, 40, () => {
-    if (buttonTester === "" || buttonTester === "Nothing to see here.") {
-        buttonTester = "Stop it.";
-    }
-    else if (buttonTester === "Stop it.") {
-        buttonTester = "The button works, okay?";
-    }
-    else {
-        buttonTester = "Nothing to see here.";
-    }
+const mainMenuScene = new Scene("MainMenu", () => { }, () => { }, (delta) => { }, (delta) => {
+    drawText("js13k 2019", 5, 5, Align.LEFT, 3);
+    drawText("theme: back", 5, 25, Align.LEFT, 2);
+    drawTexture("solid", 0, 40, 800, 1);
+    drawTexture("solid", 0, 435, 800, 1);
+    drawText(`(c) 2019 david brad`, 5, 440, Align.LEFT, 1);
+});
+const button = new Button("start game", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 40, 200, 40, () => {
+    SceneManager.push("Game");
 }, 0xFF444444, 0xff666666, 0xff222222);
 const guy1 = new Sprite([
     { textureName: "g_0", duration: 250 },
@@ -760,18 +759,32 @@ const snake3 = new Sprite([
     { textureName: "s_0", duration: 250 },
     { textureName: "s_1", duration: 250 }
 ], { x: SCREEN_WIDTH / 2 + (101 + 17 + 33), y: SCREEN_HEIGHT / 2 - 48 }, { x: 3, y: 3 });
-const mainMenu = new Scene("MainMenu", () => { }, () => { }, (delta) => { }, (delta) => {
-    drawText("js13k 2019", 5, 5, Align.LEFT, 3);
-    drawText("theme: back", 5, 25, Align.LEFT, 2);
-    drawText(`(c) 2019 david brad ${buttonTester !== "" ? " - " : ""} ${buttonTester}`, 5, 440, Align.LEFT, 1);
+mainMenuScene.rootNode.addChild(button);
+mainMenuScene.rootNode.addChild(guy1);
+mainMenuScene.rootNode.addChild(guy2);
+mainMenuScene.rootNode.addChild(guy3);
+mainMenuScene.rootNode.addChild(snake1);
+mainMenuScene.rootNode.addChild(snake2);
+mainMenuScene.rootNode.addChild(snake3);
+/// <reference path="./consts.ts" />
+/// <reference path="./scene.ts" />
+const gameScene = new Scene("Game", () => { }, () => { }, (delta) => { }, (delta) => {
+    drawText("game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 16, Align.CENTER, 3);
+    drawTexture("solid", 0, 350, 800, 1);
 });
-mainMenu.rootNode.addChild(button);
-mainMenu.rootNode.addChild(guy1);
-mainMenu.rootNode.addChild(guy2);
-mainMenu.rootNode.addChild(guy3);
-mainMenu.rootNode.addChild(snake1);
-mainMenu.rootNode.addChild(snake2);
-mainMenu.rootNode.addChild(snake3);
+gameScene.rootNode.addChild(new Button("back", SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 20, 100, 20, () => {
+    SceneManager.pop();
+}, 0xFF444444, 0xff666666, 0xff222222));
+const guy = new Sprite([
+    { textureName: "g_0", duration: 250 },
+    { textureName: "g_1", duration: 250 }
+], { x: SCREEN_WIDTH / 2 - 16, y: SCREEN_HEIGHT / 2 - 32 }, { x: 1, y: 1 });
+const snake = new Sprite([
+    { textureName: "s_0", duration: 250 },
+    { textureName: "s_1", duration: 250 }
+], { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 - 32 }, { x: 1, y: 1 });
+gameScene.rootNode.addChild(guy);
+gameScene.rootNode.addChild(snake);
 /// <reference path="./consts.ts" />
 /// <reference path="./gl.ts" />
 /// <reference path="./assets.ts" />
@@ -780,8 +793,22 @@ mainMenu.rootNode.addChild(snake3);
 /// <reference path="./stats.ts" />
 /// <reference path="./scene.ts" />
 /// <reference path="./main-menu-scene.ts" />
-SceneManager.register(mainMenu);
-SceneManager.push(mainMenu.name);
+/// <reference path="./game-scene.ts" />
+var Difficulty;
+(function (Difficulty) {
+    Difficulty[Difficulty["Easy"] = 0] = "Easy";
+    Difficulty[Difficulty["Medium"] = 1] = "Medium";
+    Difficulty[Difficulty["Hard"] = 2] = "Hard";
+})(Difficulty || (Difficulty = {}));
+var GameLength;
+(function (GameLength) {
+    GameLength[GameLength["Short"] = 0] = "Short";
+    GameLength[GameLength["Medium"] = 1] = "Medium";
+    GameLength[GameLength["Long"] = 2] = "Long";
+})(GameLength || (GameLength = {}));
+SceneManager.register(mainMenuScene);
+SceneManager.register(gameScene);
+SceneManager.push(mainMenuScene.name);
 window.addEventListener("load", () => __awaiter(this, void 0, void 0, function* () {
     let then = 0;
     function tick(now) {

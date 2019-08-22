@@ -6,14 +6,30 @@
 /// <reference path="./stats.ts" />
 /// <reference path="./scene.ts" />
 /// <reference path="./main-menu-scene.ts" />
+/// <reference path="./game-scene.ts" />
+
+enum Difficulty {
+  Easy,
+  Medium,
+  Hard
+}
+
+enum GameLength {
+  Short,
+  Medium,
+  Long
+}
 
 type GameState = {
   food: number;
   hp: number;
+  difficult: Difficulty;
+  gameLength: GameLength;
 };
 
-SceneManager.register(mainMenu);
-SceneManager.push(mainMenu.name);
+SceneManager.register(mainMenuScene);
+SceneManager.register(gameScene);
+SceneManager.push(mainMenuScene.name);
 
 window.addEventListener("load", async (): Promise<any> => {
   let then: number = 0;

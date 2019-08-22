@@ -49,6 +49,7 @@ class Scene {
     transitionOut: () => void = null,
     update: (delta: number) => void = null,
     draw: (delta: number) => void = null) {
+    this.name = name;
     this.transitionInFn = transitionIn;
     this.transitionOutFn = transitionOut;
     this.updateFn = update;
