@@ -5,29 +5,12 @@
 /// <reference path="./mouse.ts" />
 /// <reference path="./stats.ts" />
 /// <reference path="./scene.ts" />
-/// <reference path="./main-menu-scene.ts" />
-/// <reference path="./game-scene.ts" />
-
-enum Difficulty {
-  Easy,
-  Medium,
-  Hard
-}
-
-enum GameLength {
-  Short,
-  Medium,
-  Long
-}
-
-type GameState = {
-  food: number;
-  hp: number;
-  difficult: Difficulty;
-  gameLength: GameLength;
-};
+/// <reference path="./scenes/main-menu-scene.ts" />
+/// <reference path="./scenes/game-setup-scene.ts" />
+/// <reference path="./scenes/game-scene.ts" />
 
 SceneManager.register(mainMenuScene);
+SceneManager.register(gameSetupScene);
 SceneManager.register(gameScene);
 SceneManager.push(mainMenuScene.name);
 
@@ -42,19 +25,20 @@ window.addEventListener("load", async (): Promise<any> => {
     gl.cls();
     SceneManager.draw(delta);
 
-    if (process.env.NODE_ENV === "development") {
-      stats.tick(now, delta);
-    }
+    // @ifdef DEBUG
+    stats.tick(now, delta);
+    // @endif
 
     // if we lose mouse focus, put up an overlay
     if (mouse.inputDisabled) {
       gl.col(0xAA222222);
-      drawTexture("solid", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+      drawTexture("solid", 0, 0, SCREEN_WIDTH+1, SCREEN_HEIGHT+1);
       gl.col(0xFFFFFFFF);
       drawText("click to focus game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, Align.CENTER, 4);
     }
 
     gl.flush();
+    gl.col(0xFFFFFFFF);
     requestAnimationFrame(tick);
   }
 
@@ -79,11 +63,12 @@ window.addEventListener("load", async (): Promise<any> => {
     }
   );
 
-  if (process.env.NODE_ENV === "development") {
-    stats.init();
-  }
+  // @ifdef DEBUG
+  stats.init();
+  // @endif
 
   gl.init(canvas);
+  gl.bkg(49 / 255, 162 / 255, 242 / 255);
   mouse.initialize(canvas);
   await load("sheet.json");
 

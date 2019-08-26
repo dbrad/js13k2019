@@ -1,5 +1,4 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
     "target": "es6",
     "plugins": [
@@ -10,8 +9,9 @@
     ],
     "moduleResolution": "node",
     "module": "none",
-    "outFile": "./src/js/game.js"
+    "outFile": "game.js",
+    "sourceMap": true
   },
   "files": ["./src/ts/game.ts"],
-  "exclude": [".cache/**/*", "node_modules/**/*"]
+  "exclude": ["node_modules/**/*"]
 }

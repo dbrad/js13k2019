@@ -107,8 +107,8 @@ namespace gl {
     return texture;
   }
 
-  export function col(colourHex: number): void {
-    c = colourHex;
+  export function col(AABBGGRR: number): void {
+    c = AABBGGRR;
   }
 
   export function bkg(r: number, g: number, b: number): void {

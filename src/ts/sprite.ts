@@ -16,7 +16,7 @@ function* Interpolator(duration: number, easingFn: (t: number) => number = (t: n
 }
 
 function movement(origin: V2, destination: V2, duration: number): any {
- // TODO: return a function that uses an Interpolator to get from origin to dest
+  // TODO: return a function that uses an Interpolator to get from origin to dest
 }
 
 type Frame = {
@@ -28,11 +28,13 @@ class Sprite extends SceneNode {
   private interp: any = null;
   private frames: Frame[];
   private scale: V2;
-  constructor(frames: Frame[], position: V2, scale: V2) {
+  constructor(frames: Frame[], position: V2, scale: V2 = { x: 1, y: 1 }) {
     super();
+    const texture: Texture = TEXTURE_STORE.get(frames[0].textureName);
     this.frames = frames;
-    this.positon = V2.copy(position);
-    this.size = V2.copy(scale);
+    this.relPos = V2.copy(position);
+    this.scale = V2.copy(scale);
+    this.size = { x: texture.w * this.scale.x, y: texture.h * this.scale.y };
   }
 
   public moveTo(v2: V2): void {
@@ -40,7 +42,7 @@ class Sprite extends SceneNode {
   }
 
   public destroy(): void {
-    // TODO: atte,pt to prep sprite for GC
+    // TODO: attempt to prep sprite for GC
   }
   public progress: number = 0;
   public loop: boolean = false;
@@ -73,20 +75,21 @@ class Sprite extends SceneNode {
   public update(delta: number): void {
     // TODO: interp movement
     if (this.duration === 0) {
-        return;
+      return;
     } else {
-        this.progress += delta;
-        if (this.progress > this.duration) {
-            if (this.loop) {
-                this.progress = 0;
-            } else {
-                this.progress = 0;
-            }
+      this.progress += delta;
+      if (this.progress > this.duration) {
+        if (this.loop) {
+          this.progress = 0;
+        } else {
+          this.progress = 0;
         }
+      }
     }
   }
 
   public draw(delta: number): void {
-    drawTexture(this.currentFrame.textureName, this.positon.x, this.positon.y, this.size.x, this.size.y);
+    drawTexture(this.currentFrame.textureName, this.absPos.x, this.absPos.y, this.scale.x, this.scale.y);
+    super.draw(delta);
   }
 }
