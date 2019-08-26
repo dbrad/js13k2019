@@ -24,3 +24,15 @@ class ActionSlot extends SceneNode {
 class ActionCard extends SceneNode {
   public onDrop: () => void;
 }
+
+class EncounterMap extends SceneNode {
+  constructor() {
+    super();
+  }
+}
+
+class EncounterNode extends SceneNode {
+  constructor() {
+    super();
+  }
+}

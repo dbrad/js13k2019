@@ -57,6 +57,9 @@ class Scene {
   }
 
   public transitionIn(): void {
+    this.rootNode = new SceneNode();
+    this.rootNode.relPos = { x: 0, y: 0 };
+    this.rootNode.size = { x: SCREEN_WIDTH, y: SCREEN_HEIGHT };
     if (this.transitionInFn) {
       this.transitionInFn();
     }
@@ -69,6 +72,7 @@ class Scene {
     if (this.transitionOutFn) {
       this.transitionOutFn();
     }
+    this.rootNode.destroy();
     unsubscribe("mousemove", this.name);
   }
 

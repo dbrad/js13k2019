@@ -5,7 +5,7 @@ html {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #131313;
+  background-color: #1b2632;
 }
 
 #stage {
@@ -20,7 +20,8 @@ html {
 
 canvas {
   background-color: rgb(13, 13, 13);
-  border: 1px solid #bbb;
+  /*border: 1px solid #bbb;*/
+  border-radius: 1px;
 }
 
 canvas,
