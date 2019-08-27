@@ -32,9 +32,9 @@ window.addEventListener("load", async (): Promise<any> => {
     // if we lose mouse focus, put up an overlay
     if (mouse.inputDisabled) {
       gl.col(0xAA222222);
-      drawTexture("solid", 0, 0, SCREEN_WIDTH+1, SCREEN_HEIGHT+1);
+      drawTexture("solid", 0, 0, SCREEN_WIDTH + 1, SCREEN_HEIGHT + 1);
       gl.col(0xFFFFFFFF);
-      drawText("click to focus game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, Align.CENTER, 4);
+      drawText("click to focus game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, { textAlign: Align.CENTER, scale: 4 });
     }
 
     gl.flush();
@@ -68,7 +68,7 @@ window.addEventListener("load", async (): Promise<any> => {
   // @endif
 
   gl.init(canvas);
-  gl.bkg(49 / 255, 162 / 255, 242 / 255);
+  gl.bkg(172 / 255, 220 / 255, 239 / 255);
   mouse.initialize(canvas);
   await load("sheet.json");
 

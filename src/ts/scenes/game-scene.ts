@@ -24,7 +24,8 @@ const gameScene: Scene =
             { textureName: "g_0", duration: 250 },
             { textureName: "g_1", duration: 250 }
           ],
-          { x: SCREEN_WIDTH / 2 - 16, y: SCREEN_HEIGHT / 2 - 32 }));
+          { x: 0, y: 0 },
+          { x: 5, y: 5 }));
 
       gameScene.rootNode.add(
         new Sprite(
@@ -32,14 +33,15 @@ const gameScene: Scene =
             { textureName: "s_0", duration: 250 },
             { textureName: "s_1", duration: 250 }
           ],
-          { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 - 32 }));
+          { x: SCREEN_WIDTH - 80, y: 0 },
+          { x: 5, y: 5 }));
 
+      gameScene.rootNode.add(gameState.map);
     },
     () => {
     },
     (delta: number) => { },
     (delta: number) => {
-      drawText("game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 16, Align.CENTER, 3);
-      drawTexture("solid", 0, 350, 800, 1);
+      drawText("gameplay sold seperately", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 16, { textAlign: Align.CENTER, scale: 3 });
     }
   );
