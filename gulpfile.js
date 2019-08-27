@@ -6,6 +6,7 @@ const minifyHTML = require("gulp-minify-html");
 const minifyCSS = require("gulp-clean-css");
 const express = require("express");
 const path = require("path");
+const concat = require("gulp-concat");
 const sourcemaps = require("gulp-sourcemaps");
 const preprocess = require("gulp-preprocess");
 const terser = require("gulp-terser");
@@ -27,11 +28,13 @@ if (devBuild) {
   settings = {
     DEBUG: true,
     dest: "./build/debug",
+    lib: "./build/lib",
     res: "./build/debug"
   };
 } else {
   settings = {
     dest: "./build/release",
+    lib: "./build/lib",
     res: "./dist/inlined"
   };
 }
@@ -103,6 +106,25 @@ function compile() {
   return stream.pipe(gulp.dest(settings.dest));
 }
 
+function compileLib() {
+  return gulp
+    .src(["./src/lib/*.js"])
+    .pipe(concat("lib.js"))
+    .pipe(
+      terser({
+        toplevel: true
+      })
+    )
+    .pipe(gulp.dest(settings.lib));
+}
+
+function concatJs() {
+  return gulp
+    .src([`${settings.lib}/lib.js`, `${settings.dest}/*.js`])
+    .pipe(concat("game.js"))
+    .pipe(gulp.dest(settings.dest));
+}
+
 function serve() {
   var htdocs = path.resolve(__dirname, settings.dest);
   var app = express();
@@ -114,9 +136,12 @@ function serve() {
 }
 
 function watch() {
+  gulp.watch(["./src/res/*.png"], gulp.series(cleanPng, buildPng));
+  gulp.watch(["./src/res/*.json"], gulp.series(cleanJson, buildJson));
   gulp.watch(["./src/html/*.html"], buildHtml);
   gulp.watch(["./src/css/*.css"], buildCss);
-  gulp.watch(["./src/ts/**/*.ts"], compile);
+  gulp.watch(["./src/ts/**/*.ts"], gulp.series(compile, concatJs));
+  gulp.watch(["./src/lib/**/*.js"], gulp.series(compileLib, concatJs));
 }
 
 exports.serve = gulp.series(
@@ -125,7 +150,7 @@ exports.serve = gulp.series(
     gulp.series(cleanJson, buildJson),
     buildHtml,
     buildCss,
-    compile
+    gulp.series(gulp.parallel(compile, compileLib), concatJs)
   ),
   gulp.parallel(watch, serve)
 );
@@ -135,5 +160,5 @@ exports.build = gulp.parallel(
   gulp.series(cleanJson, buildJson),
   buildHtml,
   buildCss,
-  compile
+  gulp.series(gulp.parallel(compile, compileLib), concatJs)
 );

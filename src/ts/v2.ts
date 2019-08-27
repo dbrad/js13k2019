@@ -11,4 +11,10 @@ namespace V2 {
     a.x = b.x;
     a.y = b.y;
   }
+  export function add(a: V2, b: V2): V2 {
+    const result: V2 = copy(a);
+    result.x += b.x;
+    result.y += b.y;
+    return result;
+  }
 }

@@ -22,11 +22,10 @@ const mainMenuScene: Scene =
     },
     (delta: number) => { },
     (delta: number) => {
-      //gl.col(0xFF000000);
-      drawText("js13k 2019", 5, 5, Align.LEFT, 3);
-      drawText("theme: back", 5, 25, Align.LEFT, 2);
+      drawText("js13k 2019", 5, 5, { textAlign: Align.LEFT, scale: 3, colour: 0xFF3326be });
+      drawText("theme: back", 5, 25, { textAlign: Align.LEFT, scale: 2 });
       drawTexture("solid", 0, 40, 800, 1);
       drawTexture("solid", 0, 435, 800, 1);
-      drawText(`(c) 2019 david brad`, 5, 440, Align.LEFT, 1);
+      drawText(`(c) 2019 david brad`, 5, 440, { textAlign: Align.LEFT, scale: 1 });
     }
   );
