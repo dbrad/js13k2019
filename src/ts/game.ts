@@ -20,10 +20,10 @@ window.addEventListener("load", async (): Promise<any> => {
     const delta: number = now - then;
     then = now;
 
-    SceneManager.update(delta);
+    SceneManager.update(delta, now);
 
     gl.cls();
-    SceneManager.draw(delta);
+    SceneManager.draw(delta, now);
 
     // @ifdef DEBUG
     stats.tick(now, delta);
@@ -68,7 +68,7 @@ window.addEventListener("load", async (): Promise<any> => {
   // @endif
 
   gl.init(canvas);
-  gl.bkg(172 / 255, 220 / 255, 239 / 255);
+  gl.bkg(47 / 255, 72 / 255, 78 / 255);
   mouse.initialize(canvas);
   await load("sheet.json");
 

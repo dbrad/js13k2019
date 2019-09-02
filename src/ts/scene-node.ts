@@ -53,18 +53,18 @@ class SceneNode {
     this.visible = false;
   }
 
-  public update(delta: number): void {
+  public update(delta: number, now: number): void {
     if (this.enabled) {
       for (const [id, node] of this.children) {
-        node.update(delta);
+        node.update(delta, now);
       }
     }
   }
 
-  public draw(delta: number): void {
+  public draw(delta: number, now: number): void {
     if (this.visible && this.enabled) {
       for (const [id, node] of this.children) {
-        node.draw(delta);
+        node.draw(delta, now);
       }
       // @ifdef DEBUG
       gl.col(0xFF00FF00);

@@ -24,7 +24,7 @@ class Button extends SceneNode {
     colourNormal: number = 0xFF3326be,
     colourHover: number = 0xFF3d2bd9,
     colourPressed: number = 0xFF271c8c,
-    shadow: number = 0xFF845700) {
+    shadow: number = 0x99000000) {
     super();
     this.text = text;
     this.relPos = { x, y };
@@ -96,7 +96,7 @@ class Button extends SceneNode {
     super.destroy();
   }
 
-  public draw(delta: number): void {
+  public draw(delta: number, now: number): void {
     if (this.visible) {
       // @ifdef DEBUG
       assert(!!(this.parent), this);
@@ -109,7 +109,7 @@ class Button extends SceneNode {
       drawTexture("solid", this.absPos.x, this.absPos.y, this.size.x, this.size.y);
       gl.col(0XFFFFFFFF);
       drawText(this.text, this.absPos.x + ~~(this.size.x / 2), this.absPos.y - 2 + ~~(this.size.y / 2), { textAlign: Align.CENTER });
-      super.draw(delta);
+      super.draw(delta, now);
     }
   }
 }

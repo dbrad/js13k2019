@@ -25,11 +25,11 @@ namespace SceneManager {
     }
   }
 
-  export function update(delta: number): void {
-    stack[stack.length - 1].update(delta);
+  export function update(delta: number, now: number): void {
+    stack[stack.length - 1].update(delta, now);
   }
-  export function draw(delta: number): void {
-    stack[stack.length - 1].draw(delta);
+  export function draw(delta: number, now: number): void {
+    stack[stack.length - 1].draw(delta, now);
   }
 }
 
@@ -38,8 +38,8 @@ const cursor: V2 = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
 class Scene {
   public name: string;
   public rootNode: SceneNode = new SceneNode();
-  private updateFn: (delta: number) => void;
-  private drawFn: (delta: number) => void;
+  private updateFn: (delta: number, now: number) => void;
+  private drawFn: (delta: number, now: number) => void;
   private transitionInFn: () => void;
   private transitionOutFn: () => void;
 
@@ -47,8 +47,8 @@ class Scene {
     name: string,
     transitionIn: () => void = null,
     transitionOut: () => void = null,
-    update: (delta: number) => void = null,
-    draw: (delta: number) => void = null) {
+    update: (delta: number, now: number) => void = null,
+    draw: (delta: number, now: number) => void = null) {
     this.name = name;
     this.transitionInFn = transitionIn;
     this.transitionOutFn = transitionOut;
@@ -76,18 +76,18 @@ class Scene {
     unsubscribe("mousemove", this.name);
   }
 
-  public update(delta: number): void {
+  public update(delta: number, now: number): void {
     if (this.updateFn) {
-      this.updateFn(delta);
+      this.updateFn(delta, now);
     }
-    this.rootNode.update(delta);
+    this.rootNode.update(delta, now);
   }
 
-  public draw(delta: number): void {
+  public draw(delta: number, now: number): void {
     if (this.drawFn) {
-      this.drawFn(delta);
+      this.drawFn(delta, now);
     }
-    this.rootNode.draw(delta);
+    this.rootNode.draw(delta, now);
     drawTexture("cursor", cursor.x, cursor.y);
   }
 }
