@@ -24,10 +24,10 @@ class Button extends SceneNode {
     colourNormal: number = 0xFF3326be,
     colourHover: number = 0xFF3d2bd9,
     colourPressed: number = 0xFF271c8c,
-    shadow: number = 0xFF845700) {
+    shadow: number = 0x99000000) {
     super();
     this.text = text;
-    this.relPos = { x, y };
+    this.rel = { x, y };
     this.size = { x: w, y: h };
     this.onClick = onClick;
     this.colour = colourNormal;
@@ -38,8 +38,7 @@ class Button extends SceneNode {
 
     subscribe("mousemove", `button_${this.id}`, (pos: V2, mousedown: boolean): void => {
       if (this.enabled && !mousedown && (!this.parent || this.parent.enabled)) {
-        if (pos.x >= this.absPos.x && pos.x <= this.absPos.x + this.size.x &&
-          pos.y >= this.absPos.y && pos.y <= this.absPos.y + this.size.y) {
+        if (mouse.over.has(this.id)) {
           this.colour = this.colourHover;
           if (!this.hover) {
             zzfx(1, .02, 440, .05, .55, 0, 0, 0, .1);
@@ -55,11 +54,10 @@ class Button extends SceneNode {
 
     subscribe("mousedown", `button_${this.id}`, (pos: V2): void => {
       if (this.enabled && (!this.parent || this.parent.enabled)) {
-        if (pos.x >= this.absPos.x && pos.x <= this.absPos.x + this.size.x &&
-          pos.y >= this.absPos.y && pos.y <= this.absPos.y + this.size.y) {
+        if (mouse.over.has(this.id)) {
           this.colour = this.colourPressed;
-          this.relPos.x += 1;
-          this.relPos.y += 1;
+          this.rel.x += 1;
+          this.rel.y += 1;
           if (!this.down) {
             zzfx(1, .02, 220, .05, .55, 0, 0, 0, .1); // ZzFX 0
           }
@@ -70,8 +68,7 @@ class Button extends SceneNode {
 
     subscribe("mouseup", `button_${this.id}`, (pos: V2): void => {
       if (this.enabled && (!this.parent || this.parent.enabled)) {
-        if (pos.x >= this.absPos.x && pos.x <= this.absPos.x + this.size.x &&
-          pos.y >= this.absPos.y && pos.y <= this.absPos.y + this.size.y) {
+        if (mouse.over.has(this.id)) {
           this.enabled = false;
           zzfx(1,.02,330,.05,.55,0,0,0,.1); // ZzFX 0
           this.onClick(this);
@@ -81,8 +78,8 @@ class Button extends SceneNode {
         else {
           this.colour = this.colourNormal;
           if (this.down) {
-            this.relPos.x -= 1;
-            this.relPos.y -= 1;
+            this.rel.x -= 1;
+            this.rel.y -= 1;
             this.down = false;
           }
         }
@@ -96,20 +93,20 @@ class Button extends SceneNode {
     super.destroy();
   }
 
-  public draw(delta: number): void {
+  public draw(delta: number, now: number): void {
     if (this.visible) {
       // @ifdef DEBUG
       assert(!!(this.parent), this);
       // @endif
       if (!this.down) {
         gl.col(this.shadow);
-        drawTexture("solid", this.absPos.x + 1, this.absPos.y + 1, this.size.x + 1, this.size.y + 1);
+        drawTexture("solid", this.abs.x + 1, this.abs.y + 1, this.size.x + 1, this.size.y + 1);
       }
       gl.col(this.colour);
-      drawTexture("solid", this.absPos.x, this.absPos.y, this.size.x, this.size.y);
+      drawTexture("solid", this.abs.x, this.abs.y, this.size.x, this.size.y);
       gl.col(0XFFFFFFFF);
-      drawText(this.text, this.absPos.x + ~~(this.size.x / 2), this.absPos.y - 2 + ~~(this.size.y / 2), { textAlign: Align.CENTER });
-      super.draw(delta);
+      drawText(this.text, this.abs.x + ~~(this.size.x / 2), this.abs.y - 2 + ~~(this.size.y / 2), { textAlign: Align.CENTER });
+      super.draw(delta, now);
     }
   }
 }

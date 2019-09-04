@@ -121,3 +121,42 @@ generate root node
 
 
  Snake? zzfx(.1,.1,440,.7,.4,10,2,60,0); // ZzFX 46335
+
+
+ ====================================
+
+ create encounter factories
+  camp
+    rest
+    rest
+    search
+  enemy
+  boss
+  loot
+  empty
+    rest
+    search
+
+create actions
+  rest
+  search
+  attack
+  defend
+
+pick up dice
+  set anchor as mouse pos on click
+  pos rel to mouse pos
+  if mouse up on non-droppable area, send back to parent
+
+on drop dice
+  check slot condition
+    if false, send dice back to tray
+    if true, set parent of dice as slot
+  if card condition if true, consume dice and perform action
+
+once all dice used, player ends turn
+  disable end turn button
+  perform enemy turn
+  reroll player dice
+  player turn begins
+  show end turn button again

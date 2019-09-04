@@ -28,13 +28,15 @@ class Sprite extends SceneNode {
   private interp: any = null;
   private frames: Frame[];
   private scale: V2;
-  constructor(frames: Frame[], position: V2, scale: V2 = { x: 1, y: 1 }) {
+  private colour: number;
+  constructor(frames: Frame[], position: V2, scale: V2 = { x: 1, y: 1 }, colour: number = 0xFFFFFFFF) {
     super();
     const texture: Texture = TEXTURE_STORE.get(frames[0].textureName);
     this.frames = frames;
-    this.relPos = V2.copy(position);
+    this.rel = V2.copy(position);
     this.scale = V2.copy(scale);
     this.size = { x: texture.w * this.scale.x, y: texture.h * this.scale.y };
+    this.colour = colour;
   }
 
   public moveTo(v2: V2): void {
@@ -72,7 +74,7 @@ class Sprite extends SceneNode {
     return this.durationTimer;
   }
 
-  public update(delta: number): void {
+  public update(delta: number, now: number): void {
     // TODO: interp movement
     if (this.duration === 0) {
       return;
@@ -88,8 +90,10 @@ class Sprite extends SceneNode {
     }
   }
 
-  public draw(delta: number): void {
-    drawTexture(this.currentFrame.textureName, this.absPos.x, this.absPos.y, this.scale.x, this.scale.y);
-    super.draw(delta);
+  public draw(delta: number, now: number): void {
+    gl.col(this.colour);
+    drawTexture(this.currentFrame.textureName, this.abs.x, this.abs.y, this.scale.x, this.scale.y);
+    gl.col(0xFFFFFFFF);
+    super.draw(delta, now);
   }
 }

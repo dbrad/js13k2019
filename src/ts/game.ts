@@ -12,7 +12,6 @@
 SceneManager.register(mainMenuScene);
 SceneManager.register(gameSetupScene);
 SceneManager.register(gameScene);
-SceneManager.push(mainMenuScene.name);
 
 window.addEventListener("load", async (): Promise<any> => {
   let then: number = 0;
@@ -20,10 +19,10 @@ window.addEventListener("load", async (): Promise<any> => {
     const delta: number = now - then;
     then = now;
 
-    SceneManager.update(delta);
+    SceneManager.update(delta, now);
 
     gl.cls();
-    SceneManager.draw(delta);
+    SceneManager.draw(delta, now);
 
     // @ifdef DEBUG
     stats.tick(now, delta);
@@ -68,9 +67,10 @@ window.addEventListener("load", async (): Promise<any> => {
   // @endif
 
   gl.init(canvas);
-  gl.bkg(172 / 255, 220 / 255, 239 / 255);
-  mouse.initialize(canvas);
+  gl.bkg(47 / 255, 72 / 255, 78 / 255);
   await load("sheet.json");
+  mouse.initialize(canvas);
+  SceneManager.push(mainMenuScene.name);
 
   requestAnimationFrame(tick);
   window.dispatchEvent(new Event("resize"));

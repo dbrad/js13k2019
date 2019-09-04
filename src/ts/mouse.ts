@@ -2,15 +2,9 @@
 /// <reference path="./events.ts" />
 
 namespace mouse {
-  const position: V2 = { x: 400, y: 225 };
+  export const position: V2 = { x: 400, y: 225 };
+  export const over: Map<number, SceneNode> = new Map();
   export let inputDisabled: boolean = true;
-  export enum Buttons {
-    Primary,
-    Middle,
-    Secondary
-  }
-  type clickHandler = (position: V2) => void;
-  const handlers: Map<Buttons, clickHandler> = new Map();
   let mouseDown: boolean = false;
 
   export function initialize(canvas: HTMLCanvasElement): void {
@@ -50,8 +44,8 @@ namespace mouse {
       if (position.x >= 800) {
         position.x = 800 - 1;
       }
-      if (position.y >= 450) {
-        position.y = 450 - 1;
+      if (position.y >= 349) {
+        position.y = 349 - 1;
       }
       if (position.x < 0) {
         position.x = 0;

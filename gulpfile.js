@@ -86,23 +86,8 @@ function buildJson() {
 
 function compile() {
   let stream = project.src();
-
-  if (devBuild) {
-    stream = stream.pipe(sourcemaps.init());
-  }
-
   stream = stream.pipe(project()).on("error", handleError);
-
-  stream = stream.js.pipe(preprocess({ context: settings })).pipe(
-    terser({
-      toplevel: true
-    })
-  );
-
-  if (devBuild) {
-    stream = stream.pipe(sourcemaps.write("/"));
-  }
-
+  stream = stream.js.pipe(preprocess({ context: settings }));
   return stream.pipe(gulp.dest(settings.dest));
 }
 
@@ -110,11 +95,6 @@ function compileLib() {
   return gulp
     .src(["./src/lib/*.js"])
     .pipe(concat("lib.js"))
-    .pipe(
-      terser({
-        toplevel: true
-      })
-    )
     .pipe(gulp.dest(settings.lib));
 }
 
@@ -122,6 +102,19 @@ function concatJs() {
   return gulp
     .src([`${settings.lib}/lib.js`, `${settings.dest}/*.js`])
     .pipe(concat("game.js"))
+    
+    //.pipe(sourcemaps.init())
+    .pipe(
+      terser({
+        compress: {
+          passes: 5
+        },
+        toplevel: true,
+        mangle: true
+      })
+    )
+    //.pipe(sourcemaps.write("/"))
+    
     .pipe(gulp.dest(settings.dest));
 }
 

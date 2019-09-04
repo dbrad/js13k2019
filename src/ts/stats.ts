@@ -19,7 +19,6 @@ namespace stats {
         overlay.style.fontFamily = "monospace";
         overlay.style.padding = "1em";
         overlay.style.color = "white";
-        //overlay.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
         container.appendChild(overlay);
 
         const fpsDOM: HTMLDivElement = document.createElement("div");

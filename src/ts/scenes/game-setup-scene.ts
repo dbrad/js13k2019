@@ -1,6 +1,8 @@
 /// <reference path="../consts.ts" />
 /// <reference path="../scene.ts" />
+/// <reference path="../util.ts" />
 /// <reference path="../button.ts" />
+/// <reference path="../encounter.ts" />
 /// <reference path="../game-state.ts" />
 
 let gameDifficultyContainer: SceneNode;
@@ -16,14 +18,14 @@ const gameSetupScene: Scene =
       gameState.gameLength = GameLength.None;
 
       gameDifficultyContainer = new SceneNode();
-      gameDifficultyContainer.relPos.x = SCREEN_WIDTH / 2 - 100;
-      gameDifficultyContainer.relPos.y = SCREEN_HEIGHT / 2 - 65;
+      gameDifficultyContainer.rel.x = SCREEN_WIDTH / 2 - 100;
+      gameDifficultyContainer.rel.y = SCREEN_HEIGHT / 2 - 65;
       gameDifficultyContainer.size.x = 200;
       gameDifficultyContainer.size.y = 70;
 
       gameLengthContainer = new SceneNode();
-      gameLengthContainer.relPos.x = SCREEN_WIDTH / 2 - 100;
-      gameLengthContainer.relPos.y = SCREEN_HEIGHT / 2 - 65;
+      gameLengthContainer.rel.x = SCREEN_WIDTH / 2 - 100;
+      gameLengthContainer.rel.y = SCREEN_HEIGHT / 2 - 65;
       gameLengthContainer.size.x = 200;
       gameLengthContainer.size.y = 70;
 
@@ -128,39 +130,59 @@ function generateLevel(): void {
   gameState.map.playerNode = firstNode;
   gameMap.push(firstNode);
 
-  const easyDeck: EncounterNode[] = generateEncounterNodeDeck(Difficulty.Easy, firstNode);
-  gameMap.push(...easyDeck);
+  gameMap.push(...generateEncounterNodeDeck(Difficulty.Easy, gameMap[gameMap.length - 1]));
 
-  if (gameState.difficulty !== Difficulty.Hard) {
-    const diffDeck: EncounterNode[] = generateEncounterNodeDeck(gameState.difficulty, gameMap[gameMap.length - 1]);
-  gameMap.push(...diffDeck);
+  if (gameState.gameLength !== GameLength.Short) {
+    gameMap.push(...generateEncounterNodeDeck(Difficulty.Easy, gameMap[gameMap.length - 1]));
   }
 
-  const mediumDeck: EncounterNode[] = generateEncounterNodeDeck(Difficulty.Medium, gameMap[gameMap.length - 1]);
-  gameMap.push(...mediumDeck);
+  if (gameState.difficulty === Difficulty.Easy) {
+    gameMap.push(...generateEncounterNodeDeck(Difficulty.Easy, gameMap[gameMap.length - 1]));
+  }
+
+  // add camp
+  // add medium enemy
+
+  if (gameState.difficulty === Difficulty.Medium) {
+    gameMap.push(...generateEncounterNodeDeck(Difficulty.Medium, gameMap[gameMap.length - 1]));
+  }
+
+  gameMap.push(...generateEncounterNodeDeck(Difficulty.Medium, gameMap[gameMap.length - 1]));
+
+  if (gameState.gameLength !== GameLength.Short) {
+    gameMap.push(...generateEncounterNodeDeck(Difficulty.Medium, gameMap[gameMap.length - 1]));
+  }
+
+  if (gameState.gameLength === GameLength.Long) {
+    gameMap.push(...generateEncounterNodeDeck(Difficulty.Medium, gameMap[gameMap.length - 1]));
+  }
+
+  // add camp
+  // add hard enemy
 
   if (gameState.difficulty === Difficulty.Hard) {
-    const diffDeck: EncounterNode[] = generateEncounterNodeDeck(gameState.difficulty, gameMap[gameMap.length - 1]);
-  gameMap.push(...diffDeck);
+    gameMap.push(...generateEncounterNodeDeck(Difficulty.Hard, gameMap[gameMap.length - 1]));
   }
 
-  const hardDeck: EncounterNode[] = generateEncounterNodeDeck(Difficulty.Hard, gameMap[gameMap.length - 1]);
-  gameMap.push(...hardDeck);
+  if (gameState.gameLength === GameLength.Long) {
+    gameMap.push(...generateEncounterNodeDeck(Difficulty.Hard, gameMap[gameMap.length - 1]));
+  }
+
+  gameMap.push(...generateEncounterNodeDeck(Difficulty.Hard, gameMap[gameMap.length - 1]));
 
   const bossNode: EncounterNode = new EncounterNode();
   gameMap[gameMap.length - 1].next = bossNode;
   bossNode.previous = gameMap[gameMap.length - 1];
   gameMap.push(bossNode);
 
+  gameState.mapLength = gameMap.length;
   gameState.map.add(...gameMap);
 }
 
 function generateEncounterNodeDeck(difficulty: Difficulty, connectingNode: EncounterNode): EncounterNode[] {
   const nodes: EncounterNode[] = [];
-
   switch (difficulty) {
     case Difficulty.Hard:
-      nodes.push(new EncounterNode());
       nodes.push(new EncounterNode());
       nodes.push(new EncounterNode());
 
@@ -169,13 +191,11 @@ function generateEncounterNodeDeck(difficulty: Difficulty, connectingNode: Encou
     case Difficulty.Medium:
       nodes.push(new EncounterNode());
       nodes.push(new EncounterNode());
-      nodes.push(new EncounterNode());
 
       break;
 
     case Difficulty.Easy:
     default:
-      nodes.push(new EncounterNode());
       nodes.push(new EncounterNode());
       nodes.push(new EncounterNode());
 
@@ -187,25 +207,12 @@ function generateEncounterNodeDeck(difficulty: Difficulty, connectingNode: Encou
     if (i !== deck.length - 1) {
       deck[i].next = deck[i + 1];
     }
-    if(i !== 0) {
-      deck[i].previous = deck[i-1];
+    if (i !== 0) {
+      deck[i].previous = deck[i - 1];
     } else {
       connectingNode.next = deck[i];
       deck[i].previous = connectingNode;
     }
   }
   return deck;
-}
-
-function shuffle<T>(array: T[]): T[] {
-  let currentIndex: number = array.length, temporaryValue: T, randomIndex: number;
-  const arr: T[] = array.slice();
-  while (0 !== currentIndex) {
-    randomIndex = ~~(Math.random() * currentIndex);
-    currentIndex -= 1;
-    temporaryValue = arr[currentIndex];
-    arr[currentIndex] = arr[randomIndex];
-    arr[randomIndex] = temporaryValue;
-  }
-  return arr;
 }
