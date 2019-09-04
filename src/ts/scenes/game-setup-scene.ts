@@ -18,14 +18,14 @@ const gameSetupScene: Scene =
       gameState.gameLength = GameLength.None;
 
       gameDifficultyContainer = new SceneNode();
-      gameDifficultyContainer.relPos.x = SCREEN_WIDTH / 2 - 100;
-      gameDifficultyContainer.relPos.y = SCREEN_HEIGHT / 2 - 65;
+      gameDifficultyContainer.rel.x = SCREEN_WIDTH / 2 - 100;
+      gameDifficultyContainer.rel.y = SCREEN_HEIGHT / 2 - 65;
       gameDifficultyContainer.size.x = 200;
       gameDifficultyContainer.size.y = 70;
 
       gameLengthContainer = new SceneNode();
-      gameLengthContainer.relPos.x = SCREEN_WIDTH / 2 - 100;
-      gameLengthContainer.relPos.y = SCREEN_HEIGHT / 2 - 65;
+      gameLengthContainer.rel.x = SCREEN_WIDTH / 2 - 100;
+      gameLengthContainer.rel.y = SCREEN_HEIGHT / 2 - 65;
       gameLengthContainer.size.x = 200;
       gameLengthContainer.size.y = 70;
 

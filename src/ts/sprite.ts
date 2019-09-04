@@ -33,7 +33,7 @@ class Sprite extends SceneNode {
     super();
     const texture: Texture = TEXTURE_STORE.get(frames[0].textureName);
     this.frames = frames;
-    this.relPos = V2.copy(position);
+    this.rel = V2.copy(position);
     this.scale = V2.copy(scale);
     this.size = { x: texture.w * this.scale.x, y: texture.h * this.scale.y };
     this.colour = colour;
@@ -92,7 +92,7 @@ class Sprite extends SceneNode {
 
   public draw(delta: number, now: number): void {
     gl.col(this.colour);
-    drawTexture(this.currentFrame.textureName, this.absPos.x, this.absPos.y, this.scale.x, this.scale.y);
+    drawTexture(this.currentFrame.textureName, this.abs.x, this.abs.y, this.scale.x, this.scale.y);
     gl.col(0xFFFFFFFF);
     super.draw(delta, now);
   }

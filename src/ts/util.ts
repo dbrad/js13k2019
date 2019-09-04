@@ -22,3 +22,7 @@ function sum(...values: number[]): number {
   }
   return result;
 }
+
+function inside(pt: V2, topleft: V2, size: V2): boolean {
+  return (pt.x > topleft.x && pt.x <= topleft.x + size.x && pt.y > topleft.y && pt.y <= topleft.y + size.y);
+}

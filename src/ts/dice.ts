@@ -8,22 +8,30 @@ class Dice extends SceneNode {
   private rolling: boolean = false;
   private rollStart: number = 0;
   private rollDuration: number = 0;
-  public onClick: (self: Dice) => void;
-  public parent: ActionSlot | DiceTray;
-  public pickedUp: boolean;
+  private held: boolean = false;
 
   constructor() {
     super();
     this.size = { x: 32, y: 32 };
+    subscribe("mousedown", `dice_${this.id}`, (pos: V2): void => {
+      if (mouse.over.has(this.id)) {
+        this.scene.cursor.add(this);
+        this.rel = { x: -16, y: -16 };
+        this.held = true;
+      }
+    });
     subscribe("mouseup", `dice_${this.id}`, (pos: V2): void => {
-      if (this.enabled && (!this.parent || this.parent.enabled)) {
-        if (pos.x >= this.absPos.x && pos.x <= this.absPos.x + this.size.x &&
-          pos.y >= this.absPos.y && pos.y <= this.absPos.y + this.size.y) {
-          this.enabled = false;
-          this.roll(performance.now());
-          //this.onClick(this);
-          this.enabled = true;
+      if (this.held) {
+        this.held = false;
+        for (const [id, node] of mouse.over) {
+          if (node instanceof ActionSlot && node.children.size === 0) {
+            this.rel = { x: 0, y: 0 };
+            node.add(this);
+            return;
+          }
         }
+        this.rel = { x: 100, y: 250 };
+        this.scene.rootNode.add(this);
       }
     });
   }
@@ -49,64 +57,11 @@ class Dice extends SceneNode {
   }
 
   public draw(delta: number, now: number): void {
-    drawTexture(`d_${this.value}`, this.absPos.x, this.absPos.y, 2, 2);
+    drawTexture(`d_${this.value}`, this.abs.x, this.abs.y, 2, 2);
     super.draw(delta, now);
   }
 }
 
 class DiceTray extends SceneNode {
   public onDrop: () => void;
-}
-
-class ActionSlot extends SceneNode {
-  public parent: ActionCard;
-  public condition: () => boolean;
-  public onDrop: () => void;
-  constructor() {
-    super();
-    this.size = { x: 32, y: 32 };
-  }
-  public update(delta: number, now: number): void {
-
-  }
-  public draw(delta: number, now: number): void {
-    gl.col(0Xffffffff);
-    drawTexture("d_s", this.absPos.x, this.absPos.y, 2, 2);
-    gl.col(0Xffffffff);
-    super.draw(delta, now);
-  }
-}
-
-class ActionCard extends SceneNode {
-  public name: string = "";
-  public cost: string = "";
-  public desc: string = "";
-  public colour: number = 0xFF000000;
-  public condition: () => boolean;
-  public onComplete: () => void;
-
-  constructor() {
-    super();
-    this.size = { x: 235, y: 64 };
-  }
-
-  public onDrop(): void {
-    if (this.condition && this.condition()) {
-      this.onComplete();
-    }
-  }
-  public update(delta: number, now: number): void {
-
-  }
-  public draw(delta: number, now: number): void {
-    gl.col(0x99000000);
-    drawTexture("solid", this.absPos.x + 1, this.absPos.y + 1, this.size.x, this.size.y);
-    gl.col(this.colour);
-    drawTexture("solid", this.absPos.x, this.absPos.y, this.size.x, this.size.y);
-    gl.col(0Xffffffff);
-    drawText(this.name, this.absPos.x + 5, this.absPos.y + 5, { scale: 2 });
-    drawText(this.cost, this.absPos.x + 5, this.absPos.y + 16);
-    drawText(this.desc, this.absPos.x + 5, this.absPos.y + 22);
-    super.draw(delta, now);
-  }
 }

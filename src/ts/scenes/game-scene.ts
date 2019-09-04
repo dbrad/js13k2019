@@ -33,15 +33,15 @@ const gameScene: Scene =
           0XFFaaFFFF));
 
       const dice: Dice = new Dice();
-      dice.relPos = { x: 80, y: encounter.size.y - 48 };
+      dice.rel = { x: 80, y: encounter.size.y - 48 };
       encounter.add(dice);
 
       const dice2: Dice = new Dice();
-      dice2.relPos = { x: 120, y: encounter.size.y - 48 };
+      dice2.rel = { x: 120, y: encounter.size.y - 48 };
       encounter.add(dice2);
 
       const dice3: Dice = new Dice();
-      dice3.relPos = { x: 160, y: encounter.size.y - 48 };
+      dice3.rel = { x: 160, y: encounter.size.y - 48 };
       encounter.add(dice3);
 
       gameScene.rootNode.add(gameState.map);

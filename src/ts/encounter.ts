@@ -22,7 +22,7 @@ class Encounter extends SceneNode {
   public onComplete: () => void = (): void => { };
   constructor() {
     super();
-    this.relPos = { x: 0, y: 0 };
+    this.rel = { x: 0, y: 0 };
     this.size = { x: 800, y: 350 };
   }
   public update(delta: number, now: number): void {
@@ -34,8 +34,8 @@ class Encounter extends SceneNode {
           row = 0;
           col++;
         }
-        child.relPos.x = 2 + (child.size.x + 4) * col;
-        child.relPos.y = 2 + row * (child.size.y + 4);
+        child.rel.x = 2 + (child.size.x + 4) * col;
+        child.rel.y = 2 + row * (child.size.y + 4);
         row++;
       }
     }
@@ -51,8 +51,8 @@ class EncounterMap extends SceneNode {
   public player: Sprite;
   constructor() {
     super();
-    this.relPos.x = 0;
-    this.relPos.y = 350;
+    this.rel.x = 0;
+    this.rel.y = 350;
     this.size.x = 800;
     this.size.y = 100;
     for (let x: number = 0; x < 100; x++) {
@@ -99,11 +99,11 @@ class EncounterMap extends SceneNode {
     const startingX: number = (SCREEN_WIDTH / 2) - (32 * ~~(gameState.mapLength / 2)) - (16 * (gameState.mapLength % 2));
     const drawPos: V2 = { x: startingX, y: 42 };
     while (currentNode !== null) {
-      currentNode.relPos = V2.copy(drawPos);
+      currentNode.rel = V2.copy(drawPos);
       drawPos.x += 32;
       currentNode = currentNode.next;
     }
-    this.player.relPos.x = this.playerNode.relPos.x;
+    this.player.rel.x = this.playerNode.rel.x;
     super.update(delta, now);
   }
 
@@ -116,13 +116,14 @@ class EncounterMap extends SceneNode {
     */
    super.draw(delta, now);
     gl.col(0Xffffffff);
-    drawTexture("solid", this.absPos.x, this.absPos.y, 800, 1);
+    drawTexture("solid", this.abs.x, this.abs.y, 800, 1);
   }
 }
 
 class EncounterNode extends SceneNode {
   public next: EncounterNode = null;
   public previous: EncounterNode = null;
+  public encounter: Encounter;
   constructor() {
     super();
     this.size = { x: 16, y: 16 };
@@ -132,11 +133,11 @@ class EncounterNode extends SceneNode {
   public draw(delta: number, now: number): void {
     if (this.next) {
       gl.col(0xFFFFFFFF);
-      const origin: V2 = V2.add(this.absPos, { x: 8, y: 8 });
+      const origin: V2 = V2.add(this.abs, { x: 8, y: 8 });
       drawLine(origin, V2.add(origin, { x: 32, y: 0 }));
     }
     gl.col(0xFF8888ff);
-    drawTexture("node", this.absPos.x, this.absPos.y);
+    drawTexture("node", this.abs.x, this.abs.y);
     gl.col(0xFFFFFFFF);
     super.draw(delta, now);
   }

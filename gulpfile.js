@@ -102,18 +102,19 @@ function concatJs() {
   return gulp
     .src([`${settings.lib}/lib.js`, `${settings.dest}/*.js`])
     .pipe(concat("game.js"))
-    /*
-    .pipe(sourcemaps.init())
+    
+    //.pipe(sourcemaps.init())
     .pipe(
       terser({
         compress: {
           passes: 5
         },
         toplevel: true,
+        mangle: true
       })
     )
-    .pipe(sourcemaps.write("/"))
-    */
+    //.pipe(sourcemaps.write("/"))
+    
     .pipe(gulp.dest(settings.dest));
 }
 

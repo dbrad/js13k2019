@@ -12,7 +12,6 @@
 SceneManager.register(mainMenuScene);
 SceneManager.register(gameSetupScene);
 SceneManager.register(gameScene);
-SceneManager.push(mainMenuScene.name);
 
 window.addEventListener("load", async (): Promise<any> => {
   let then: number = 0;
@@ -69,8 +68,9 @@ window.addEventListener("load", async (): Promise<any> => {
 
   gl.init(canvas);
   gl.bkg(47 / 255, 72 / 255, 78 / 255);
-  mouse.initialize(canvas);
   await load("sheet.json");
+  mouse.initialize(canvas);
+  SceneManager.push(mainMenuScene.name);
 
   requestAnimationFrame(tick);
   window.dispatchEvent(new Event("resize"));

@@ -1,4 +1,5 @@
 /// <reference path="./scene-node.ts" />
+/// <reference path="./mouse.ts" />
 
 namespace SceneManager {
   const scenes: Map<string, Scene> = new Map();
@@ -33,15 +34,14 @@ namespace SceneManager {
   }
 }
 
-const cursor: V2 = { x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 };
-
 class Scene {
   public name: string;
-  public rootNode: SceneNode = new SceneNode();
+  public rootNode: SceneNode;
+  public cursor: Sprite;
   private updateFn: (delta: number, now: number) => void;
   private drawFn: (delta: number, now: number) => void;
-  private transitionInFn: () => void;
-  private transitionOutFn: () => void;
+  private tranIn: () => void;
+  private tranOut: () => void;
 
   constructor(
     name: string,
@@ -50,30 +50,44 @@ class Scene {
     update: (delta: number, now: number) => void = null,
     draw: (delta: number, now: number) => void = null) {
     this.name = name;
-    this.transitionInFn = transitionIn;
-    this.transitionOutFn = transitionOut;
+    this.tranIn = transitionIn;
+    this.tranOut = transitionOut;
     this.updateFn = update;
     this.drawFn = draw;
   }
 
   public transitionIn(): void {
-    this.rootNode = new SceneNode();
-    this.rootNode.relPos = { x: 0, y: 0 };
+    this.rootNode = new SceneNode(this);
+    this.rootNode.rel = { x: 0, y: 0 };
     this.rootNode.size = { x: SCREEN_WIDTH, y: SCREEN_HEIGHT };
-    if (this.transitionInFn) {
-      this.transitionInFn();
+    this.cursor = new Sprite(
+      [
+        { textureName: "cursor", duration: 0 }
+      ],
+      V2.copy(mouse.position));
+    this.rootNode.add(this.cursor);
+
+    if (this.tranIn) {
+      this.tranIn();
     }
     subscribe("mousemove", this.name, (pos: V2) => {
-      V2.set(cursor, pos);
+      V2.set(this.cursor.rel, pos);
+      mouse.over.clear();
+      const nodes: SceneNode[] = this.rootNode.nodesAt(pos);
+      for(let i: number = 0; i< nodes.length; i++) {
+        mouse.over.set(nodes[i].id, nodes[i]);
+      }
     });
+    emit("mousemove", V2.copy(mouse.position), false);
   }
 
   public transitionOut(): void {
-    if (this.transitionOutFn) {
-      this.transitionOutFn();
+    if (this.tranOut) {
+      this.tranOut();
     }
     this.rootNode.destroy();
     unsubscribe("mousemove", this.name);
+    mouse.over.clear();
   }
 
   public update(delta: number, now: number): void {
@@ -88,6 +102,6 @@ class Scene {
       this.drawFn(delta, now);
     }
     this.rootNode.draw(delta, now);
-    drawTexture("cursor", cursor.x, cursor.y);
+    this.cursor.draw(delta, now);
   }
 }

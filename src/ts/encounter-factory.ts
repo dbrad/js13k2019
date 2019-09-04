@@ -7,16 +7,6 @@ function emptyEncounter(): Encounter {
   encounter.food = rand(1, 3);
   encounter.add(restAction());
   encounter.add(searchAction());
-  encounter.add(searchAction());
-  encounter.add(searchAction());
-  encounter.add(searchAction());
-  encounter.add(searchAction());
-  encounter.add(searchAction());
-  encounter.add(searchAction());
-  encounter.add(searchAction());
-  encounter.add(searchAction());
-  encounter.add(searchAction());
-  encounter.add(searchAction());
   return encounter;
 }
 function campEncounter(): void { }

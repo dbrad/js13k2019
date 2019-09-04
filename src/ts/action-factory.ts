@@ -1,10 +1,10 @@
-/// <reference path="./dice.ts" />
+/// <reference path="./action.ts" />
 /// <reference path="./util.ts" />
 /// <reference path="./game-state.ts" />
 
 function restAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot();
-  slot.relPos = { x: 235 - 48, y: 16 };
+  slot.rel = { x: 235 - 48, y: 16 };
   slot.condition = (): boolean => {
     const values: number[] = Array.from(slot.children, ([id, die]) => (die as Dice).value);
     return sum(...values) > 0;
@@ -34,7 +34,7 @@ function restAction(): ActionCard {
 
 function searchAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot();
-  slot.relPos = { x: 235 - 48, y: 16 };
+  slot.rel = { x: 235 - 48, y: 16 };
   slot.condition = (): boolean => {
     const values: number[] = Array.from(slot.children, ([id, die]) => (die as Dice).value);
     return sum(...values) > 0;
