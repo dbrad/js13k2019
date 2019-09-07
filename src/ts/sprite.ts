@@ -3,22 +3,6 @@
 /// <reference path="./draw.ts" />
 /// <reference path="./v2.ts" />
 
-function* Interpolator(duration: number, easingFn: (t: number) => number = (t: number) => t): IterableIterator<number> {
-  const start: number = yield 0;
-  let now: number = start;
-  while (now - start < duration) {
-    const val: number = easingFn((now - start) / duration);
-    now = yield val;
-  }
-  if (now - start >= duration) {
-    return 1;
-  }
-}
-
-function movement(origin: V2, destination: V2, duration: number): any {
-  // TODO: return a function that uses an Interpolator to get from origin to dest
-}
-
 type Frame = {
   textureName: string;
   duration: number;
@@ -39,12 +23,8 @@ class Sprite extends SceneNode {
     this.colour = colour;
   }
 
-  public moveTo(v2: V2): void {
-    // TODO: want to kick off a linear interp for movement
-  }
-
   public destroy(): void {
-    // TODO: attempt to prep sprite for GC
+    super.destroy();
   }
   public progress: number = 0;
   public loop: boolean = false;

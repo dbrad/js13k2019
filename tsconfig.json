@@ -9,8 +9,7 @@
     ],
     "moduleResolution": "node",
     "module": "none",
-    "outFile": "game.js",
-    "sourceMap": true
+    "outFile": "game.js"
   },
   "files": ["./src/ts/game.ts"],
   "exclude": ["node_modules/**/*"]

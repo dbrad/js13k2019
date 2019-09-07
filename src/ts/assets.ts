@@ -99,6 +99,14 @@ async function load(url: string): Promise<{}> {
       },
       {
         "type": "sprite",
+        "id": "d_l",
+        "x": 128,
+        "y": 10,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "type": "sprite",
         "id": "solid",
         "x": 1,
         "y": 0,

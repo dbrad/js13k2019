@@ -71,23 +71,25 @@ class Scene {
       this.tranIn();
     }
     subscribe("mousemove", this.name, (pos: V2) => {
-      V2.set(this.cursor.rel, pos);
-      mouse.over.clear();
-      const nodes: SceneNode[] = this.rootNode.nodesAt(pos);
-      for(let i: number = 0; i< nodes.length; i++) {
-        mouse.over.set(nodes[i].id, nodes[i]);
+      if (this.cursor.enabled) {
+        V2.set(this.cursor.rel, pos);
+        mouse.over.clear();
+        const nodes: SceneNode[] = this.rootNode.nodesAt(pos);
+        for (let i: number = 0; i < nodes.length; i++) {
+          mouse.over.set(nodes[i].id, nodes[i]);
+        }
       }
     });
     emit("mousemove", V2.copy(mouse.position), false);
   }
 
   public transitionOut(): void {
+    unsubscribe("mousemove", this.name);
+    mouse.over.clear();
     if (this.tranOut) {
       this.tranOut();
     }
     this.rootNode.destroy();
-    unsubscribe("mousemove", this.name);
-    mouse.over.clear();
   }
 
   public update(delta: number, now: number): void {
@@ -103,5 +105,8 @@ class Scene {
     }
     this.rootNode.draw(delta, now);
     this.cursor.draw(delta, now);
+    // @ifdef DEBUG
+    drawText(`${this.cursor.abs.x}, ${this.cursor.abs.y}`, this.cursor.abs.x + 16, this.cursor.abs.y + 16);
+    // @endif
   }
 }
