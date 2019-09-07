@@ -1,10 +1,12 @@
+/// <reference path="./interpolator.ts" />
+
 let idGen: number = 0;
 
 class SceneNode {
   public id: number;
   private SCENE: Scene;
   public get scene(): Scene {
-    if(this.SCENE === null) {
+    if (this.SCENE === null) {
       return this.parent.scene;
     }
     return this.SCENE;
@@ -13,6 +15,7 @@ class SceneNode {
   public children: Map<number, SceneNode> = new Map();
   public rel: V2 = { x: 0, y: 0 };
   public anchor: V2 = { x: 0, y: 0 };
+  public animation: (now: number) => boolean = null;
   public get abs(): V2 {
     return {
       x: this.anchor.x + (this.parent ? this.parent.abs.x + this.rel.x : this.rel.x),
@@ -30,7 +33,7 @@ class SceneNode {
 
   public add(...nodes: SceneNode[]): void {
     for (const node of nodes) {
-      if(node.parent) {
+      if (node.parent) {
         node.parent.remove(node);
       }
       this.children.set(node.id, node);
@@ -76,8 +79,38 @@ class SceneNode {
     }
     return result;
   }
+  public moveTo(dest: V2, duration: number = 0, callback: () => void = null, easingFn: EasingFn = (t: number) => t): void {
+    const o: V2 = V2.copy(this.rel);
+    const d: V2 = V2.copy(dest);
+    if(o.x === d.x && o.y === d.y) {
+      return;
+    }
+    if (duration === 0) {
+      this.rel = V2.copy(dest);
+      return;
+    }
+    const interp: IterableIterator<number> = Interpolator(duration, easingFn);
+    this.animation = (now: number): boolean => {
+      const i: IteratorResult<number> = interp.next(now);
+      this.rel.x = o.x + Math.round((d.x - o.x) * i.value);
+      this.rel.y = o.y + Math.round((d.y - o.y) * i.value);
+      if (i.done) {
+        this.rel.x = d.x;
+        this.rel.y = d.y;
+        if (callback) {
+          window.setTimeout(callback,0);
+        }
+      }
+      return i.done;
+    };
+  }
 
   public update(delta: number, now: number): void {
+    if (this.animation) {
+      if (this.animation(now)) {
+        this.animation = null;
+      }
+    }
     if (this.enabled) {
       for (const [id, node] of this.children) {
         node.update(delta, now);

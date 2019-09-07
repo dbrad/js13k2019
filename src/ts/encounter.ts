@@ -1,5 +1,6 @@
 /// <reference path="./scene-node.ts" />
 /// <reference path="./draw.ts" />
+/// <reference path="./enemy.ts" />
 /// <reference path="./dice.ts" />
 /// <reference path="./sprite.ts" />
 /// <reference path="./consts.ts" />
@@ -17,26 +18,47 @@ class Encounter extends SceneNode {
   public type: EncounterType;
   public loot: any;
   public food: number;
-  public enemy: any;
-  public onEnter: () => void = (): void => { };
+  public enemy: Enemy;
+  public isComplete: boolean = false;
   public onComplete: () => void = (): void => { };
   constructor() {
     super();
     this.rel = { x: 0, y: 0 };
     this.size = { x: 800, y: 350 };
   }
+  public empty(): void {
+    for (const [id, child] of this.children) {
+      if (child instanceof ActionCard) {
+        child.destroy();
+      }
+    }
+    if (this.enemy) {
+      this.remove(this.enemy);
+      this.enemy = null;
+    }
+  }
   public update(delta: number, now: number): void {
+    let actionCount: number = 0;
     let row: number = 0;
     let col: number = 0;
     for (const [id, child] of this.children) {
       if (child instanceof ActionCard) {
+        actionCount++;
         if (row > 3) {
           row = 0;
           col++;
         }
-        child.rel.x = 2 + (child.size.x + 4) * col;
-        child.rel.y = 2 + row * (child.size.y + 4);
+        if (child.enabled && !child.animation) {
+          child.moveTo({ x: 2 + (child.size.x + 4) * col, y: 2 + row * (child.size.y + 4) }, 250);
+        }
         row++;
+      }
+    }
+    if (!this.isComplete) {
+      if ((actionCount === 0 && !this.enemy) ||
+        (this.enemy && this.enemy.isDead)) {
+        this.isComplete = true;
+        this.onComplete();
       }
     }
     super.update(delta, now);
@@ -68,12 +90,12 @@ class EncounterMap extends SceneNode {
         );
       }
     }
-    for(let t: number = 0; t < 100; t++) {
+    for (let t: number = 0; t < 100; t++) {
       this.add(new Sprite(
         [
           { textureName: `tree`, duration: 0 }
         ],
-        { x: rand(0, 800), y: rand(0,25) })
+        { x: rand(0, 800), y: rand(0, 25) })
       );
     }
     this.player = new Sprite(
@@ -83,26 +105,18 @@ class EncounterMap extends SceneNode {
       ],
       { x: 0, y: 26 });
     this.add(this.player);
-    for(let t: number = 0; t < 100; t++) {
+    for (let t: number = 0; t < 100; t++) {
       this.add(new Sprite(
         [
           { textureName: `tree`, duration: 0 }
         ],
-        { x: rand(0, 800), y: rand(55,100) })
+        { x: rand(0, 800), y: rand(55, 100) })
       );
     }
   }
   public destroy(): void { }
 
   public update(delta: number, now: number): void {
-    let currentNode: EncounterNode = this.playerNode;
-    const startingX: number = (SCREEN_WIDTH / 2) - (32 * ~~(gameState.mapLength / 2)) - (16 * (gameState.mapLength % 2));
-    const drawPos: V2 = { x: startingX, y: 42 };
-    while (currentNode !== null) {
-      currentNode.rel = V2.copy(drawPos);
-      drawPos.x += 32;
-      currentNode = currentNode.next;
-    }
     this.player.rel.x = this.playerNode.rel.x;
     super.update(delta, now);
   }
@@ -114,7 +128,7 @@ class EncounterMap extends SceneNode {
     gl.col(0x33FFFFFF);
     drawTexture("solid", this.absPos.x, this.absPos.y, 800, 100);
     */
-   super.draw(delta, now);
+    super.draw(delta, now);
     gl.col(0Xffffffff);
     drawTexture("solid", this.abs.x, this.abs.y, 800, 1);
   }
@@ -123,10 +137,11 @@ class EncounterMap extends SceneNode {
 class EncounterNode extends SceneNode {
   public next: EncounterNode = null;
   public previous: EncounterNode = null;
-  public encounter: Encounter;
-  constructor() {
+  public encounter: Encounter = null;
+  constructor(encounter: Encounter = emptyEncounter()) {
     super();
     this.size = { x: 16, y: 16 };
+    this.encounter = encounter;
   }
   public destroy(): void { }
 
@@ -134,7 +149,7 @@ class EncounterNode extends SceneNode {
     if (this.next) {
       gl.col(0xFFFFFFFF);
       const origin: V2 = V2.add(this.abs, { x: 8, y: 8 });
-      drawLine(origin, V2.add(origin, { x: 32, y: 0 }));
+      drawLine(origin, V2.add(origin, { x: 16, y: 0 }));
     }
     gl.col(0xFF8888ff);
     drawTexture("node", this.abs.x, this.abs.y);

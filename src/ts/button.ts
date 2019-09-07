@@ -68,20 +68,16 @@ class Button extends SceneNode {
 
     subscribe("mouseup", `button_${this.id}`, (pos: V2): void => {
       if (this.enabled && (!this.parent || this.parent.enabled)) {
+        if (this.down) {
+          this.colour = this.colourNormal;
+          this.rel.x -= 1;
+          this.rel.y -= 1;
+          this.down = false;
+        }
         if (mouse.over.has(this.id)) {
-          this.enabled = false;
-          zzfx(1,.02,330,.05,.55,0,0,0,.1); // ZzFX 0
+          zzfx(1, .02, 330, .05, .55, 0, 0, 0, .1); // ZzFX 0
           this.onClick(this);
           this.colour = this.colourHover;
-          this.enabled = true;
-        }
-        else {
-          this.colour = this.colourNormal;
-          if (this.down) {
-            this.rel.x -= 1;
-            this.rel.y -= 1;
-            this.down = false;
-          }
         }
       }
     });
