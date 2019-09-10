@@ -23,130 +23,155 @@ const gameScene: Scene =
   new Scene(
     "Game",
     () => {
-      const root: SceneNode = gameScene.rootNode;
+      const root: SceneNode = gameScene._root;
 
-      root.add(gameState.tray);
-      gameState.tray.rel = { x: 80, y: 280 };
+      root._add(gameState._tray);
+      gameState._tray._rel = { x: 80, y: 280 };
 
-      root.add(
+      root._add(
         new Sprite(
           [
-            { textureName: "g_0", duration: 250 },
-            { textureName: "g_1", duration: 250 }
+            { _tex: "g_0", _duration: 250 },
+            { _tex: "g_1", _duration: 250 }
           ],
-          { x: 0, y: 350 - (16 * 5) },
+          { x: 0, y: 270 },
           { x: 5, y: 5 }));
 
       fwdBtn = new Button(
         "forward!",
-        root.size.x - 120, root.size.y - 150,
+        root._size.x - 120, root._size.y - 150,
         100, 30,
         (self: Button): void => {
-          if (gameState.encounter) {
-            gameScene.rootNode.remove(gameState.encounter);
+          if (gameState._encounter) {
+            gameScene._root._remove(gameState._encounter);
           }
-          gameState.map.playerNode = gameState.map.playerNode.next;
-          gameState.encounter = gameState.map.playerNode.encounter;
-          gameScene.rootNode.add(gameState.encounter);
+          gameState._map._playerNode = gameState._map._playerNode._next;
+          gameState._encounter = gameState._map._playerNode._encounter;
+          gameScene._root._add(gameState._encounter);
           phase = Phase.Begin;
-          if (gameState.food > 0) {
-            gameState.food--; // TODO: minus food animation?
+          if (gameState._food > 0) {
+            gameState._food--;
           } else {
-            gameState.hp--; // TODO: Damage func with sound / animation?
-            if (gameState.hp <= 0) {
+            gameState._hp--;
+            if (gameState._hp <= 0) {
               phase = Phase.GameOver;
             }
           }
-          self.enabled = self.visible = false;
-          endBtn.enabled = endBtn.visible = false;
-        });
-      root.add(fwdBtn);
+          self._enabled = self._visible = false;
+          endBtn._enabled = endBtn._visible = false;
+        },
+        0xFF1A8944,
+        0xFF1FA150,
+        0xFF156E37);
+      root._add(fwdBtn);
 
       endBtn = new Button(
         "end turn",
-        root.size.x - 120, root.size.y - 150,
+        root._size.x - 120, root._size.y - 150,
         100, 30,
         (self: Button): void => {
           if (phase === Phase.Player) {
             phase = Phase.Enemy;
           }
-          self.enabled = self.visible = false;
+          self._enabled = self._visible = false;
         });
-      root.add(endBtn);
+      root._add(endBtn);
 
-      root.add(gameState.map);
+      root._add(gameState._map);
     },
     () => {
     },
     (delta: number, now: number) => {
-      if ((!gameState.encounter) && gameState.map.playerNode.next) {
-        fwdBtn.enabled = true;
-        fwdBtn.visible = true;
-        endBtn.enabled = false;
-        endBtn.visible = false;
+      if ((!gameState._encounter) && gameState._map._playerNode._next) {
+        fwdBtn._enabled = fwdBtn._visible = true;
+        endBtn._enabled = endBtn._visible = false;
       } else {
         if (phase === Phase.GameOver) {
           // TODO: Gameover sequence
         } else if (phase === Phase.Begin) {
-          // Get inventory actions inventory.getAction(combat)
-          // add to encounter
-          phase = Phase.Rolling;
-        } else if (phase === Phase.Rolling) {
-          gameState.tray.restock(now);
-          phase = Phase.Player;
-          endBtn.enabled = true;
-          endBtn.visible = true;
-        } else if (phase === Phase.Restock) {
-          for (const [id, child] of gameState.encounter.children) {
-            if (child instanceof ActionCard) {
-              child.reset();
+          gameState._def = 0;
+          gameState._debuffs.length = 0;
+          for (const item of gameState._inventory) {
+            if (item._type === ItemType.combat &&
+              (gameState._encounter._type === EncounterType.Fight || gameState._encounter._type === EncounterType.Boss)) {
+              gameState._encounter._add(item._action());
+            }
+            if (item._type === ItemType.any) {
+              gameState._encounter._add(item._action());
             }
           }
           phase = Phase.Rolling;
+        } else if (phase === Phase.Rolling) {
+          if (gameState._encounter._enemy) {
+            gameState._encounter._enemy._roll(now);
+          }
+          gameState._tray._restock(now);
+          phase = Phase.Player;
+          endBtn._enabled = endBtn._visible = true;
+        } else if (phase === Phase.Restock) {
+          for (const [id, child] of gameState._encounter._nodes) {
+            if (child instanceof ActionCard) {
+              child._reset();
+            }
+          }
+          gameState._def = 0;
+          for (const debuff of gameState._debuffs) {
+            switch (debuff) {
+              case "stun":
+                gameState._tray._lock(1);
+                break;
+              case "bleed":
+                break;
+              default:
+            }
+          }
+          gameState._debuffs.length = 0;
+          phase = Phase.Rolling;
         }
-        switch (gameState.encounter.type) {
+        switch (gameState._encounter._type) {
           case EncounterType.Boss:
           case EncounterType.Fight:
             if (phase === Phase.Player) {
-              if (gameState.encounter.enemy && gameState.encounter.enemy.isDead) {
-                endBtn.enabled = false;
-                endBtn.visible = false;
-                fwdBtn.enabled = true;
-                fwdBtn.visible = true;
+              if (gameState._encounter._enemy && gameState._encounter._enemy._isDead) {
+                endBtn._enabled = endBtn._visible = false;
+                fwdBtn._enabled = fwdBtn._visible = true;
               }
             } else if (phase === Phase.Enemy) {
-              if (gameState.encounter.enemy) {
-                gameState.encounter.enemy.turn();
+              if (gameState._encounter._enemy) {
+                gameState._encounter._enemy._turn();
               }
-              if (gameState.hp <= 0) {
+              if (gameState._hp <= 0) {
                 phase = Phase.GameOver;
               } else {
                 phase = Phase.Restock;
               }
             }
             break;
-          case EncounterType.Camp:
-            break;
           case EncounterType.Loot:
-            break;
+          case EncounterType.Camp:
           case EncounterType.Empty:
           default:
-            if (gameState.map.playerNode.next) {
-              fwdBtn.enabled = true;
-              fwdBtn.visible = true;
-              endBtn.enabled = false;
-              endBtn.visible = false;
+            if (gameState._map._playerNode._next) {
+              fwdBtn._enabled = fwdBtn._visible = true;
+              endBtn._enabled = endBtn._visible = false;
             } else {
-              fwdBtn.enabled = false;
-              fwdBtn.visible = false;
+              fwdBtn._enabled = fwdBtn._visible = false;
             }
             break;
         }
       }
     },
     (delta: number) => {
-      const root: SceneNode = gameScene.rootNode;
-      drawText(`Food ${gameState.food}`, root.size.x - 70, root.size.y - 112, { textAlign: Align.CENTER });
-      drawText(`HP ${gameState.hp}/${gameState.maxHp}`, 80, 330, { scale: 2 });
+      const root: SceneNode = gameScene._root;
+      drawText(`Food ${gameState._food}`, root._size.x - 70, root._size.y - 115, { _textAlign: Align.CENTER, _scale: 2 });
+      drawText(`DEF ${gameState._def}`, 80, 320, { _scale: 2, _colour: 0xFFF2A231 });
+      drawText(`HP  ${gameState._hp > 0 ? gameState._hp : 0}/${gameState._maxHp}`, 80, 335, { _scale: 2, _colour: 0xFF3326BE });
     }
   );
+
+let itemX: number = 195;
+function addItem(item: Item): void {
+  gameScene._root._add(item);
+  item._rel = { x: itemX, y: 330 };
+  itemX += 17;
+}

@@ -5,6 +5,8 @@
 /// <reference path="../button.ts" />
 /// <reference path="../encounter.ts" />
 /// <reference path="../game-state.ts" />
+/// <reference path="../item.ts" />
+/// <reference path="../item-factory.ts" />
 
 let gameDifficultyContainer: SceneNode;
 let gameLengthContainer: SceneNode;
@@ -13,113 +15,113 @@ const gameSetupScene: Scene =
   new Scene(
     "GameSetup",
     () => {
-      gameState.tray = new DiceTray();
-      gameState.tray.dice.push({ values: [1, 2, 3, 4, 5, 6], colour: 0xFFFFFFFF });
-      gameState.tray.dice.push({ values: [1, 2, 3, 4, 5, 6], colour: 0xFFFFFFFF });
-      gameState.food = 5;
-      gameState.hp = 10;
-      gameState.maxHp = 10;
-      gameState.diff = Difficulty.None;
-      gameState.gameLength = GameLength.None;
+      gameState._tray = new DiceTray();
+      gameState._tray._dice.push({ _values: [1, 2, 3, 4, 5, 6], _colour: 0xFFFFFFFF });
+      gameState._tray._dice.push({ _values: [1, 2, 3, 4, 5, 6], _colour: 0xFFFFFFFF });
+      gameState._food = 5;
+      gameState._hp = 10;
+      gameState._maxHp = 10;
+      gameState._diff = Dif.None;
+      gameState._gameLength = GameLen.None;
 
       gameDifficultyContainer = new SceneNode();
-      gameDifficultyContainer.rel.x = SCREEN_WIDTH / 2 - 100;
-      gameDifficultyContainer.rel.y = SCREEN_HEIGHT / 2 - 65;
-      gameDifficultyContainer.size.x = 200;
-      gameDifficultyContainer.size.y = 70;
+      gameDifficultyContainer._rel.x = SCREEN_WIDTH / 2 - 100;
+      gameDifficultyContainer._rel.y = SCREEN_HEIGHT / 2 - 65;
+      gameDifficultyContainer._size.x = 200;
+      gameDifficultyContainer._size.y = 70;
 
       gameLengthContainer = new SceneNode();
-      gameLengthContainer.rel.x = SCREEN_WIDTH / 2 - 100;
-      gameLengthContainer.rel.y = SCREEN_HEIGHT / 2 - 65;
-      gameLengthContainer.size.x = 200;
-      gameLengthContainer.size.y = 70;
+      gameLengthContainer._rel.x = SCREEN_WIDTH / 2 - 100;
+      gameLengthContainer._rel.y = SCREEN_HEIGHT / 2 - 65;
+      gameLengthContainer._size.x = 200;
+      gameLengthContainer._size.y = 70;
 
-      gameSetupScene.rootNode.add(gameDifficultyContainer);
-      gameSetupScene.rootNode.add(gameLengthContainer);
+      gameSetupScene._root._add(gameDifficultyContainer);
+      gameSetupScene._root._add(gameLengthContainer);
 
       gameDifficultyContainer
-        .add(new Button(
+        ._add(new Button(
           "easy",
           0,
           0,
           200,
           20,
           () => {
-            gameState.diff = Difficulty.Easy;
+            gameState._diff = Dif.Easy;
           }));
 
       gameDifficultyContainer
-        .add(new Button(
+        ._add(new Button(
           "medium",
           0,
           25,
           200,
           20,
           () => {
-            gameState.diff = Difficulty.Medium;
+            gameState._diff = Dif.Medium;
           }));
 
       gameDifficultyContainer
-        .add(new Button(
+        ._add(new Button(
           "hard",
           0,
           50,
           200,
           20,
           () => {
-            gameState.diff = Difficulty.Hard;
+            gameState._diff = Dif.Hard;
           }));
 
-      gameLengthContainer.add(new Button(
+      gameLengthContainer._add(new Button(
         "short",
         0, 0,
         200, 20,
         () => {
-          gameState.gameLength = GameLength.Short;
-          generateLevel();
-          SceneManager.pop();
-          SceneManager.push("Game");
+          gameState._gameLength = GameLen.Short;
+          setup();
+          SceneManager._pop();
+          SceneManager._push("Game");
         }));
 
-      gameLengthContainer.add(new Button(
+      gameLengthContainer._add(new Button(
         "medium",
         0, 25,
         200, 20,
         () => {
-          gameState.gameLength = GameLength.Medium;
-          generateLevel();
-          SceneManager.pop();
-          SceneManager.push("Game");
+          gameState._gameLength = GameLen.Medium;
+          setup();
+          SceneManager._pop();
+          SceneManager._push("Game");
         }));
 
-      gameLengthContainer.add(new Button(
+      gameLengthContainer._add(new Button(
         "long",
         0, 50,
         200, 20,
         () => {
-          gameState.gameLength = GameLength.Long;
-          generateLevel();
-          SceneManager.pop();
-          SceneManager.push("Game");
+          gameState._gameLength = GameLen.Long;
+          setup();
+          SceneManager._pop();
+          SceneManager._push("Game");
         }));
     },
     () => {
     },
     (delta: number) => {
-      if (gameState.diff === Difficulty.None) {
-        gameDifficultyContainer.enabled = true;
-        gameDifficultyContainer.visible = true;
-        gameLengthContainer.enabled = false;
-        gameLengthContainer.visible = false;
+      if (gameState._diff === Dif.None) {
+        gameDifficultyContainer._enabled = true;
+        gameDifficultyContainer._visible = true;
+        gameLengthContainer._enabled = false;
+        gameLengthContainer._visible = false;
       } else {
-        gameDifficultyContainer.enabled = false;
-        gameDifficultyContainer.visible = false;
-        gameLengthContainer.enabled = true;
-        gameLengthContainer.visible = true;
+        gameDifficultyContainer._enabled = false;
+        gameDifficultyContainer._visible = false;
+        gameLengthContainer._enabled = true;
+        gameLengthContainer._visible = true;
       }
     },
     (delta: number) => {
-      if (gameState.diff === Difficulty.None) {
+      if (gameState._diff === Dif.None) {
 
       } else {
 
@@ -127,108 +129,126 @@ const gameSetupScene: Scene =
     }
   );
 
-function generateLevel(): void {
-  gameState.map = new EncounterMap();
+function setup(): void {
+  gameState._lootDeck.push(daggerItem());
+  gameState._lootDeck.push(daggerItem());
+  gameState._lootDeck.push(daggerItem());
+  gameState._lootDeck.push(daggerItem());
+  gameState._lootDeck.push(daggerItem());
+  /*
+  gameState._lootDeck.push(swordItem());
+  gameState._lootDeck.push(bucklerItem());
+  gameState._lootDeck.push(bucklerItem());
+  gameState._lootDeck.push(shieldItem());
+  gameState._lootDeck.push(bandageItem());
+  gameState._lootDeck.push(firstAidItem());
+  */
+  gameState._lootDeck = shuffle(gameState._lootDeck);
+
+  gameState._map = new EncounterMap();
   const gameMap: EncounterNode[] = [];
 
   const firstNode: EncounterNode = new EncounterNode(null);
-  gameState.map.playerNode = firstNode;
+  gameState._map._playerNode = firstNode;
   gameMap.push(firstNode);
 
-  gameMap.push(...generateEncounterNodeDeck(Difficulty.Easy, gameMap[gameMap.length - 1]));
+  gameMap.push(...generateEncounterNodeDeck(Dif.Easy, gameMap[gameMap.length - 1], true));
 
-  if (gameState.gameLength !== GameLength.Short) {
-    gameMap.push(...generateEncounterNodeDeck(Difficulty.Easy, gameMap[gameMap.length - 1]));
+  if (gameState._gameLength !== GameLen.Short) {
+    gameMap.push(...generateEncounterNodeDeck(Dif.Easy, gameMap[gameMap.length - 1]));
   }
 
-  if (gameState.diff === Difficulty.Easy) {
-    gameMap.push(...generateEncounterNodeDeck(Difficulty.Easy, gameMap[gameMap.length - 1]));
+  if (gameState._diff === Dif.Easy) {
+    gameMap.push(...generateEncounterNodeDeck(Dif.Easy, gameMap[gameMap.length - 1], true));
   }
 
-  // add camp
-  // add medium enemy
+  const camp1: EncounterNode = new EncounterNode(campEncounter());
+  gameMap[gameMap.length - 1]._next = camp1;
+  camp1._previous = gameMap[gameMap.length - 1];
+  gameMap.push(camp1);
 
-  if (gameState.diff === Difficulty.Medium) {
-    gameMap.push(...generateEncounterNodeDeck(Difficulty.Medium, gameMap[gameMap.length - 1]));
+  const firstBoss: EncounterNode = new EncounterNode(bossEncounter(Dif.Easy));
+  gameMap[gameMap.length - 1]._next = firstBoss;
+  firstBoss._previous = gameMap[gameMap.length - 1];
+  gameMap.push(firstBoss);
+
+  if (gameState._diff === Dif.Medium) {
+    gameMap.push(...generateEncounterNodeDeck(Dif.Medium, gameMap[gameMap.length - 1], true));
   }
 
-  gameMap.push(...generateEncounterNodeDeck(Difficulty.Medium, gameMap[gameMap.length - 1]));
+  gameMap.push(...generateEncounterNodeDeck(Dif.Medium, gameMap[gameMap.length - 1], true));
 
-  if (gameState.gameLength !== GameLength.Short) {
-    gameMap.push(...generateEncounterNodeDeck(Difficulty.Medium, gameMap[gameMap.length - 1]));
+  if (gameState._gameLength !== GameLen.Short) {
+    gameMap.push(...generateEncounterNodeDeck(Dif.Medium, gameMap[gameMap.length - 1]));
   }
 
-  if (gameState.gameLength === GameLength.Long) {
-    gameMap.push(...generateEncounterNodeDeck(Difficulty.Medium, gameMap[gameMap.length - 1]));
+  if (gameState._gameLength === GameLen.Long) {
+    gameMap.push(...generateEncounterNodeDeck(Dif.Medium, gameMap[gameMap.length - 1]));
   }
 
-  // add camp
-  // add hard enemy
+  const camp2: EncounterNode = new EncounterNode(campEncounter());
+  gameMap[gameMap.length - 1]._next = camp2;
+  camp2._previous = gameMap[gameMap.length - 1];
+  gameMap.push(camp2);
 
-  if (gameState.diff === Difficulty.Hard) {
-    gameMap.push(...generateEncounterNodeDeck(Difficulty.Hard, gameMap[gameMap.length - 1]));
+  const secondboss: EncounterNode = new EncounterNode(bossEncounter(Dif.Medium));
+  gameMap[gameMap.length - 1]._next = secondboss;
+  secondboss._previous = gameMap[gameMap.length - 1];
+  gameMap.push(secondboss);
+
+  if (gameState._diff === Dif.Hard) {
+    gameMap.push(...generateEncounterNodeDeck(Dif.Hard, gameMap[gameMap.length - 1], true));
   }
 
-  if (gameState.gameLength === GameLength.Long) {
-    gameMap.push(...generateEncounterNodeDeck(Difficulty.Hard, gameMap[gameMap.length - 1]));
+  if (gameState._gameLength === GameLen.Long) {
+    gameMap.push(...generateEncounterNodeDeck(Dif.Hard, gameMap[gameMap.length - 1]));
   }
 
-  gameMap.push(...generateEncounterNodeDeck(Difficulty.Hard, gameMap[gameMap.length - 1]));
+  gameMap.push(...generateEncounterNodeDeck(Dif.Hard, gameMap[gameMap.length - 1], true));
 
-  const bossNode: EncounterNode = new EncounterNode();
-  gameMap[gameMap.length - 1].next = bossNode;
-  bossNode.previous = gameMap[gameMap.length - 1];
-  gameMap.push(bossNode);
+  const camp3: EncounterNode = new EncounterNode(campEncounter());
+  gameMap[gameMap.length - 1]._next = camp3;
+  camp3._previous = gameMap[gameMap.length - 1];
+  gameMap.push(camp3);
 
-  gameState.mapLength = gameMap.length;
-  gameState.map.add(...gameMap);
+  const finalBossNode: EncounterNode = new EncounterNode(bossEncounter(Dif.Boss));
+  gameMap[gameMap.length - 1]._next = finalBossNode;
+  finalBossNode._previous = gameMap[gameMap.length - 1];
+  gameMap.push(finalBossNode);
 
-  let currentNode: EncounterNode = gameState.map.playerNode;
-  const startingX: number = (SCREEN_WIDTH / 2) - (16 * ~~(gameState.mapLength / 2)) - (16 * (gameState.mapLength % 2));
+  gameState._mapLength = gameMap.length;
+  gameState._map._add(...gameMap);
+
+  let currentNode: EncounterNode = gameState._map._playerNode;
+  const startingX: number = (SCREEN_WIDTH / 2) - (16 * ~~(gameState._mapLength / 2)) - (16 * (gameState._mapLength % 2));
   const drawPos: V2 = { x: startingX, y: 42 };
   while (currentNode !== null) {
-    currentNode.rel = V2.copy(drawPos);
+    currentNode._rel = V2.copy(drawPos);
     drawPos.x += 16;
-    currentNode = currentNode.next;
+    currentNode = currentNode._next;
   }
 }
 
-function generateEncounterNodeDeck(difficulty: Difficulty, connectingNode: EncounterNode): EncounterNode[] {
+function generateEncounterNodeDeck(difficulty: Dif, connectingNode: EncounterNode, loot: boolean = false): EncounterNode[] {
   const nodes: EncounterNode[] = [];
-  switch (difficulty) {
-    case Difficulty.Hard:
-      nodes.push(new EncounterNode());
-      nodes.push(new EncounterNode(enemyEncounter(difficulty)));
-      nodes.push(new EncounterNode(enemyEncounter(difficulty)));
+  nodes.push(new EncounterNode());
+  nodes.push(new EncounterNode(enemyEncounter(difficulty)));
+  nodes.push(new EncounterNode(enemyEncounter(difficulty)));
 
-      break;
-
-    case Difficulty.Medium:
-      nodes.push(new EncounterNode());
-      nodes.push(new EncounterNode(enemyEncounter(difficulty)));
-      nodes.push(new EncounterNode(enemyEncounter(difficulty)));
-
-      break;
-
-    case Difficulty.Easy:
-    default:
-      nodes.push(new EncounterNode());
-      nodes.push(new EncounterNode());
-      nodes.push(new EncounterNode(enemyEncounter(difficulty)));
-
-      break;
+  if (loot) {
+    nodes.push(new EncounterNode(lootEncounter()));
   }
 
   const deck: EncounterNode[] = shuffle(nodes);
   for (let i: number = 0; i < deck.length; i++) {
     if (i !== deck.length - 1) {
-      deck[i].next = deck[i + 1];
+      deck[i]._next = deck[i + 1];
     }
     if (i !== 0) {
-      deck[i].previous = deck[i - 1];
+      deck[i]._previous = deck[i - 1];
     } else {
-      connectingNode.next = deck[i];
-      deck[i].previous = connectingNode;
+      connectingNode._next = deck[i];
+      deck[i]._previous = connectingNode;
     }
   }
   return deck;

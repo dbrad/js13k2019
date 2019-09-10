@@ -12,7 +12,7 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 function rand(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return ~~(Math.random() * (max - min + 1)) + min;
 }
 
 function sum(...values: number[]): number {

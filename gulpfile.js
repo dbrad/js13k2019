@@ -63,7 +63,7 @@ function cleanPng() {
 function buildPng() {
   return gulp
     .src("src/res/*.png")
-    .pipe(imagemin({ progressive: true }))
+    .pipe(imagemin([imagemin.optipng({ optimizationLevel: 7 })]))
     .pipe(gulp.dest(settings.dest))
     .pipe(gulp.dest(settings.res));
 }
@@ -99,23 +99,28 @@ function compileLib() {
 }
 
 function concatJs() {
-  return gulp
-    .src([`${settings.lib}/lib.js`, `${settings.dest}/*.js`])
-    .pipe(concat("game.js"))
-    
-    //.pipe(sourcemaps.init())
-    .pipe(
-      terser({
-        compress: {
-          passes: 5
-        },
-        toplevel: true,
-        mangle: true
-      })
-    )
-    //.pipe(sourcemaps.write("/"))
-    
-    .pipe(gulp.dest(settings.dest));
+  return (
+    gulp
+      .src([`${settings.lib}/lib.js`, `${settings.dest}/*.js`])
+      .pipe(sourcemaps.init())
+      .pipe(concat("game.js"))
+      .pipe(
+        terser({
+          compress: {
+            passes: 10
+          },
+          toplevel: true,
+          mangle: {
+            properties: {
+              keep_quoted: true,
+              regex: /^_.*/
+            }
+          }
+        })
+      )
+      .pipe(sourcemaps.write("/"))
+      .pipe(gulp.dest(settings.dest))
+  );
 }
 
 function serve() {

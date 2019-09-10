@@ -4,76 +4,74 @@
 /// <reference path="./v2.ts" />
 
 type Frame = {
-  textureName: string;
-  duration: number;
+  _tex: string;
+  _duration: number;
 };
 
 class Sprite extends SceneNode {
-  private interp: any = null;
-  private frames: Frame[];
-  private scale: V2;
-  private colour: number;
+  private _frames: Frame[];
+  private _scale: V2;
+  private _colour: number;
   constructor(frames: Frame[], position: V2, scale: V2 = { x: 1, y: 1 }, colour: number = 0xFFFFFFFF) {
     super();
-    const texture: Texture = TEXTURE_STORE.get(frames[0].textureName);
-    this.frames = frames;
-    this.rel = V2.copy(position);
-    this.scale = V2.copy(scale);
-    this.size = { x: texture.w * this.scale.x, y: texture.h * this.scale.y };
-    this.colour = colour;
+    const texture: Texture = TEXTURE_STORE.get(frames[0]._tex);
+    this._frames = frames;
+    this._rel = V2.copy(position);
+    this._scale = V2.copy(scale);
+    this._size = { x: texture.w * this._scale.x, y: texture.h * this._scale.y };
+    this._colour = colour;
   }
 
-  public destroy(): void {
-    super.destroy();
+  public _destroy(): void {
+    super._destroy();
   }
-  public progress: number = 0;
-  public loop: boolean = false;
-  get currentFrame(): Frame {
-    if (this.duration === 0) {
-      return this.frames[0];
+  public _progress: number = 0;
+  public _loop: boolean = false;
+  get _currentFrame(): Frame {
+    if (this._duration === 0) {
+      return this._frames[0];
     } else {
       let totalDuration: number = 0;
-      for (const frame of this.frames) {
-        totalDuration += frame.duration;
-        if (this.progress <= totalDuration) {
+      for (const frame of this._frames) {
+        totalDuration += frame._duration;
+        if (this._progress <= totalDuration) {
           return frame;
         }
       }
-      return this.frames[this.frames.length - 1];
+      return this._frames[this._frames.length - 1];
     }
   }
 
-  private durationTimer: number = -1;
-  get duration(): number {
-    if (this.durationTimer === -1) {
-      this.durationTimer = 0;
-      for (const frame of this.frames) {
-        this.durationTimer += frame.duration;
+  private _durationTimer: number = -1;
+  get _duration(): number {
+    if (this._durationTimer === -1) {
+      this._durationTimer = 0;
+      for (const frame of this._frames) {
+        this._durationTimer += frame._duration;
       }
     }
-    return this.durationTimer;
+    return this._durationTimer;
   }
 
-  public update(delta: number, now: number): void {
-    // TODO: interp movement
-    if (this.duration === 0) {
+  public _update(delta: number, now: number): void {
+    if (this._duration === 0) {
       return;
     } else {
-      this.progress += delta;
-      if (this.progress > this.duration) {
-        if (this.loop) {
-          this.progress = 0;
+      this._progress += delta;
+      if (this._progress > this._duration) {
+        if (this._loop) {
+          this._progress = 0;
         } else {
-          this.progress = 0;
+          this._progress = 0;
         }
       }
     }
   }
 
-  public draw(delta: number, now: number): void {
-    gl.col(this.colour);
-    drawTexture(this.currentFrame.textureName, this.abs.x, this.abs.y, this.scale.x, this.scale.y);
-    gl.col(0xFFFFFFFF);
-    super.draw(delta, now);
+  public _draw(delta: number, now: number): void {
+    gl._col(this._colour);
+    drawTexture(this._currentFrame._tex, this._abs.x, this._abs.y, this._scale.x, this._scale.y);
+    gl._col(0xFFFFFFFF);
+    super._draw(delta, now);
   }
 }

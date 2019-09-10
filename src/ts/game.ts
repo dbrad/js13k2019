@@ -9,35 +9,31 @@
 /// <reference path="./scenes/game-setup-scene.ts" />
 /// <reference path="./scenes/game-scene.ts" />
 
-SceneManager.register(mainMenuScene);
-SceneManager.register(gameSetupScene);
-SceneManager.register(gameScene);
-
 window.addEventListener("load", async (): Promise<any> => {
   let then: number = 0;
   function tick(now: number): void {
     const delta: number = now - then;
     then = now;
 
-    SceneManager.update(delta, now);
+    SceneManager._update(delta, now);
 
-    gl.cls();
-    SceneManager.draw(delta, now);
+    gl._cls();
+    SceneManager._draw(delta, now);
 
     // @ifdef DEBUG
-    stats.tick(now, delta);
+    _tickFps(delta, now);
     // @endif
 
     // if we lose mouse focus, put up an overlay
-    if (mouse.inputDisabled) {
-      gl.col(0xAA222222);
+    if (mouse._inputDisabled) {
+      gl._col(0xAA222222);
       drawTexture("solid", 0, 0, SCREEN_WIDTH + 1, SCREEN_HEIGHT + 1);
-      gl.col(0xFFFFFFFF);
-      drawText("click to focus game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, { textAlign: Align.CENTER, scale: 4 });
+      gl._col(0xFFFFFFFF);
+      drawText("click to focus game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, { _textAlign: Align.CENTER, _scale: 4 });
     }
 
-    gl.flush();
-    gl.col(0xFFFFFFFF);
+    gl._flush();
+    gl._col(0xFFFFFFFF);
     requestAnimationFrame(tick);
   }
 
@@ -63,14 +59,17 @@ window.addEventListener("load", async (): Promise<any> => {
   );
 
   // @ifdef DEBUG
-  stats.init();
+  _initFps();
   // @endif
 
-  gl.init(canvas);
-  gl.bkg(47 / 255, 72 / 255, 78 / 255);
+  gl._init(canvas);
+  gl._bkg(47 / 255, 72 / 255, 78 / 255);
   await load("sheet.json");
-  mouse.initialize(canvas);
-  SceneManager.push(mainMenuScene.name);
+  mouse._initialize(canvas);
+  SceneManager._register(mainMenuScene);
+  SceneManager._register(gameSetupScene);
+  SceneManager._register(gameScene);
+  SceneManager._push(mainMenuScene._name);
 
   requestAnimationFrame(tick);
   window.dispatchEvent(new Event("resize"));

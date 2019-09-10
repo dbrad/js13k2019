@@ -4,114 +4,150 @@
 /// <reference path="./interpolator.ts" />
 
 class ActionSlot extends SceneNode {
-  public parent: ActionCard;
-  public condition: () => boolean;
-  public text: string = "";
+  public _parent: ActionCard;
+  public _condition: () => boolean;
+  public _text: string = "";
   constructor(text: string, condition: () => boolean) {
     super();
-    this.text = text;
-    this.condition = condition;
-    this.size = { x: 32, y: 32 };
+    this._text = text;
+    this._condition = condition;
+    this._size = { x: 32, y: 32 };
   }
 
-  public total(): number {
-    const values: number[] = Array.from(this.children, ([id, die]) => (die as Dice).value);
+  public get _total(): number {
+    const values: number[] = Array.from(this._nodes, ([id, die]) => (die as Dice)._value);
     return sum(...values);
   }
 
-  public onDrop(): boolean {
-    if (this.condition && this.condition()) {
-      this.parent.onDrop();
-      return true;
+  public _reset(): void {
+    const dice: Dice[] = Array.from(this._nodes, ([id, die]) => (die as Dice));
+    for (const die of dice) {
+      gameState._tray._add(die);
+      die._used = false;
     }
+  }
+
+  public _onDrop(): boolean {
+    if (this._condition && this._condition()) {
+      return this._parent._onDrop();
+    }
+    zzfx(1, .1, 281, .3, .2, 0, .4, 31.1, .56);
     return false;
   }
 
-  public update(delta: number, now: number): void {
+  public _update(delta: number, now: number): void {
 
   }
 
-  public draw(delta: number, now: number): void {
-    gl.col(0Xffffffff);
-    drawTexture("d_s", this.abs.x, this.abs.y, 2, 2);
-    drawText(this.text, this.abs.x + 17, this.abs.y + 34, { textAlign: Align.CENTER, colour: 0Xffcccccc });
-    super.draw(delta, now);
+  public _draw(delta: number, now: number): void {
+    gl._col(0Xffffffff);
+    drawTexture("d_s", this._abs.x, this._abs.y, 2, 2);
+    drawText(this._text, this._abs.x + 17, this._abs.y + 34, { _textAlign: Align.CENTER, _colour: 0Xffcccccc });
+    super._draw(delta, now);
   }
 }
 
 class ActionCard extends SceneNode {
-  public name: string = "";
-  public cost: string = "";
-  public desc: string = "";
-  public colour: number = 0xFF000000;
-  private slots: number = 0;
-  public condition: () => boolean;
-  public onComplete: () => void;
+  public _name: string = "";
+  public _cost: string = "";
+  public _desc: string = "";
+  public _colour: number = 0xFF000000;
+  private _numSlots: number = 0;
+  public _condition: () => boolean;
+  public _onComplete: () => void;
+  public _parent: Encounter;
 
   constructor(name: string, desc: string, cost: string, colour: number, condition: () => boolean, onComplete: () => void) {
     super();
-    this.name = name;
-    this.desc = desc;
-    this.cost = cost;
-    this.colour = colour;
-    this.condition = condition;
-    this.onComplete = onComplete;
-    this.size = { x: 235, y: 64 };
+    this._name = name;
+    this._desc = desc;
+    this._cost = cost;
+    this._colour = colour;
+    this._condition = condition;
+    this._onComplete = onComplete;
+    this._size = { x: 260, y: 64 };
   }
 
-  public add(...nodes: SceneNode[]): void {
+  public _add(...nodes: SceneNode[]): void {
     for (const node of nodes) {
       if (node instanceof ActionSlot) {
-        this.slots++;
-        node.rel = { x: this.size.x - (this.slots * 37), y: 16 };
+        this._numSlots++;
+        node._rel = { x: this._size.x - (this._numSlots * 37), y: 16 };
       }
     }
-    super.add(...nodes);
+    super._add(...nodes);
   }
 
-  public total(): number {
-    const values: number[] = Array.from(this.children, ([id, s]) => (s as ActionSlot).total());
+  public get _dice(): Dice[] {
+    return this._slots
+      .reduce((a, s) => {
+        a.push(...Array.from(s._nodes, ([id, n]) => n));
+        return a;
+      }, new Array<SceneNode>())
+      .filter((d): d is Dice => d instanceof Dice);
+  }
+
+  public get _slots(): ActionSlot[] {
+    return Array.from(this._nodes, ([id, node]) => node).filter((s): s is ActionSlot => s instanceof ActionSlot);
+  }
+
+  public get _total(): number {
+    const values: number[] = Array.from(this._nodes, ([id, s]) => (s as ActionSlot)._total);
     return sum(...values);
   }
 
-  public onDrop(): void {
-    if (this.condition && this.condition()) {
-      this.onComplete();
-    }
+  public get _full(): boolean {
+    const values: number[] = Array.from(this._nodes, ([id, s]) => (s as ActionSlot)._total);
+    return values.reduce((acc, cur) => acc && (cur > 0), true);
   }
-  public reset(): void {
-    const slots: ActionSlot[] = Array.from(this.children, ([id, s]) => (s as ActionSlot));
+
+  public _onDrop(): boolean {
+    if (this._full) {
+      if (this._condition && this._condition()) {
+        this._onComplete();
+        for(const die of this._dice) {
+          die._used = true;
+        }
+        return true;
+      }
+      zzfx(1, .1, 281, .3, .2, 0, .4, 31.1, .56);
+      return false;
+    }
+    return true;
+  }
+  public _reset(): void {
+    const slots: ActionSlot[] = Array.from(this._nodes, ([id, s]) => (s as ActionSlot));
     for (const slot of slots) {
-      for (const [id, child] of slot.children) {
-        child.destroy();
+      for (const [id, child] of slot._nodes) {
+        child._destroy();
       }
     }
-    this.enabled = true;
+    this._enabled = true;
   }
-  public hide(reset: boolean): void {
-    this.moveTo({ x: -250, y: this.rel.y }, 250, () => { this.enabled = false; if (reset) { this.reset(); } }, easeInBack);
+  public _hide(reset: boolean): void {
+    this._moveTo({ x: -265, y: this._rel.y }, 250, () => { this._enabled = false; if (reset) { this._reset(); } }, easeInBack);
   }
-  public destroy(): void {
-    this.moveTo({ x: -250, y: this.rel.y }, 250, () => { super.destroy(); }, easeInBack);
+  public _destroy(): void {
+    this._moveTo({ x: -265, y: this._rel.y }, 250, () => { super._destroy(); }, easeInBack);
   }
-  public update(delta: number, now: number): void {
-    super.update(delta, now);
+  public _update(delta: number, now: number): void {
+    super._update(delta, now);
   }
-  public draw(delta: number, now: number): void {
+  public _draw(delta: number, now: number): void {
     // Shadow
-    gl.col(0x99000000);
-    drawTexture("solid", this.abs.x + 1, this.abs.y + 1, this.size.x, this.size.y);
+    gl._col(0x99000000);
+    drawTexture("solid", this._abs.x + 1, this._abs.y + 1, this._size.x, this._size.y);
 
     // Box
-    gl.col(this.colour);
-    drawTexture("solid", this.abs.x, this.abs.y, this.size.x, this.size.y);
+    gl._col(this._colour);
+    drawTexture("solid", this._abs.x, this._abs.y, this._size.x, this._size.y);
 
     // Body
-    gl.col(0Xffffffff);
-    drawText(this.name, this.abs.x + 5, this.abs.y + 3, { scale: 2 });
-    drawTexture("solid", this.abs.x + 5, this.abs.y + 14, this.size.x - 10, 1);
-    drawText(`cost: ${this.cost}`, this.abs.x + 5, this.abs.y + 16);
-    drawText(this.desc, this.abs.x + 5, this.abs.y + 22, { wrap: 160 });
-    super.draw(delta, now);
+    gl._col(0Xffffffff);
+    drawText(this._name, this._abs.x + 5, this._abs.y + 3, { _scale: 2 });
+    drawTexture("solid", this._abs.x + 5, this._abs.y + 14, this._size.x - 10, 1);
+    drawText(`cost: ${this._cost}`, this._abs.x + 5, this._abs.y + 16);
+    drawText(this._desc, this._abs.x + 5, this._abs.y + 22, { _wrap: 160 });
+    super._draw(delta, now);
   }
 }

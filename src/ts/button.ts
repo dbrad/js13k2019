@@ -7,15 +7,15 @@
 /// <reference path="./zzfx.d.ts" />
 
 class Button extends SceneNode {
-  public text: string;
-  public onClick: (self: Button) => void;
-  private down: boolean = false;
-  private hover: boolean = false;
-  public colour: number;
-  public colourNormal: number;
-  public colourHover: number;
-  public colourPressed: number;
-  public shadow: number;
+  public _text: string;
+  public _onClick: (self: Button) => void;
+  private _down: boolean = false;
+  private _hover: boolean = false;
+  public _colour: number;
+  public _colourNormal: number;
+  public _colourHover: number;
+  public _colourPressed: number;
+  public _shadow: number;
   constructor(
     text: string,
     x: number, y: number,
@@ -26,83 +26,80 @@ class Button extends SceneNode {
     colourPressed: number = 0xFF271c8c,
     shadow: number = 0x99000000) {
     super();
-    this.text = text;
-    this.rel = { x, y };
-    this.size = { x: w, y: h };
-    this.onClick = onClick;
-    this.colour = colourNormal;
-    this.colourNormal = colourNormal;
-    this.colourHover = colourHover;
-    this.colourPressed = colourPressed;
-    this.shadow = shadow;
+    this._text = text;
+    this._rel = { x, y };
+    this._size = { x: w, y: h };
+    this._onClick = onClick;
+    this._colour = colourNormal;
+    this._colourNormal = colourNormal;
+    this._colourHover = colourHover;
+    this._colourPressed = colourPressed;
+    this._shadow = shadow;
 
-    subscribe("mousemove", `button_${this.id}`, (pos: V2, mousedown: boolean): void => {
-      if (this.enabled && !mousedown && (!this.parent || this.parent.enabled)) {
-        if (mouse.over.has(this.id)) {
-          this.colour = this.colourHover;
-          if (!this.hover) {
+    subscribe("mmove", `btn_${this._id}`, (pos: V2, mdown: boolean): void => {
+      if (this._enabled && !mdown && (!this._parent || this._parent._enabled)) {
+        if (mouse._over.has(this._id)) {
+          this._colour = this._colourHover;
+          if (!this._hover) {
             zzfx(1, .02, 440, .05, .55, 0, 0, 0, .1);
           }
-          this.hover = true;
+          this._hover = true;
         }
         else {
-          this.colour = this.colourNormal;
-          this.hover = false;
+          this._colour = this._colourNormal;
+          this._hover = false;
         }
       }
     });
 
-    subscribe("mousedown", `button_${this.id}`, (pos: V2): void => {
-      if (this.enabled && (!this.parent || this.parent.enabled)) {
-        if (mouse.over.has(this.id)) {
-          this.colour = this.colourPressed;
-          this.rel.x += 1;
-          this.rel.y += 1;
-          if (!this.down) {
+    subscribe("mdown", `btn_${this._id}`, (pos: V2): void => {
+      if (this._enabled && (!this._parent || this._parent._enabled)) {
+        if (mouse._over.has(this._id)) {
+          this._colour = this._colourPressed;
+          this._rel.x += 1;
+          this._rel.y += 1;
+          if (!this._down) {
             zzfx(1, .02, 220, .05, .55, 0, 0, 0, .1); // ZzFX 0
           }
-          this.down = true;
+          this._down = true;
         }
       }
     });
 
-    subscribe("mouseup", `button_${this.id}`, (pos: V2): void => {
-      if (this.enabled && (!this.parent || this.parent.enabled)) {
-        if (this.down) {
-          this.colour = this.colourNormal;
-          this.rel.x -= 1;
-          this.rel.y -= 1;
-          this.down = false;
+    subscribe("mup", `btn_${this._id}`, (pos: V2): void => {
+      if (this._enabled && (!this._parent || this._parent._enabled)) {
+        if (this._down) {
+          this._colour = this._colourNormal;
+          this._rel.x -= 1;
+          this._rel.y -= 1;
+          this._down = false;
         }
-        if (mouse.over.has(this.id)) {
+        if (mouse._over.has(this._id)) {
           zzfx(1, .02, 330, .05, .55, 0, 0, 0, .1); // ZzFX 0
-          this.onClick(this);
-          this.colour = this.colourHover;
+          this._onClick(this);
+          this._colour = this._colourHover;
         }
       }
     });
   }
-  public destroy(): void {
-    unsubscribe("mousemove", `button_${this.id}`);
-    unsubscribe("mousedown", `button_${this.id}`);
-    unsubscribe("mouseup", `button_${this.id}`);
-    super.destroy();
+  public _destroy(): void {
+    unsubscribe("mmove", `btn_${this._id}`);
+    unsubscribe("mdown", `btn_${this._id}`);
+    unsubscribe("mup", `btn_${this._id}`);
+    super._destroy();
   }
 
-  public draw(delta: number, now: number): void {
-    if (this.visible) {
-      // @ifdef DEBUG
-      assert(!!(this.parent), this);
-      // @endif
-      if (!this.down) {
-        gl.col(this.shadow);
-        drawTexture("solid", this.abs.x + 1, this.abs.y + 1, this.size.x + 1, this.size.y + 1);
+  public _draw(delta: number, now: number): void {
+    if (this._visible) {
+      if (!this._down) {
+        gl._col(this._shadow);
+        drawTexture("solid", this._abs.x + 1, this._abs.y + 1, this._size.x + 1, this._size.y + 1);
       }
-      gl.col(this.colour);
-      drawTexture("solid", this.abs.x, this.abs.y, this.size.x, this.size.y);
-      gl.col(0XFFFFFFFF);
-      drawText(this.text, this.abs.x + ~~(this.size.x / 2), this.abs.y - 2 + ~~(this.size.y / 2), { textAlign: Align.CENTER });
-      super.draw(delta, now);
+      gl._col(this._colour);
+      drawTexture("solid", this._abs.x, this._abs.y, this._size.x, this._size.y);
+      gl._col(0XFFFFFFFF);
+      drawText(this._text, this._abs.x + ~~(this._size.x / 2), this._abs.y - 2 + ~~(this._size.y / 2), { _textAlign: Align.CENTER });
+      super._draw(delta, now);
     }
   }
 }
