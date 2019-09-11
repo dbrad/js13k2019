@@ -75,10 +75,10 @@ class Encounter extends SceneNode {
     super._update(delta, now);
   }
   public _draw(delta: number, now: number): void {
-    drawText("tips", 400, 210, { _textAlign: Align.C, _scale: 2, _colour: 0xFF403B27 });
+    drawText("tips", 400, 210, { _textAlign: Align.C, _scale: 2, _colour: 0xFF262417 });
     let tipY: number = 222;
     for (const tip of this._tips) {
-      drawText(tip, 400, tipY, { _textAlign: Align.C, _colour: 0xFF403B27 });
+      drawText(tip, 400, tipY, { _textAlign: Align.C, _colour: 0xFF262417 });
       tipY += 12;
     }
     super._draw(delta, now);
