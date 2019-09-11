@@ -21,11 +21,14 @@ let fwdBtn: Button;
 let endBtn: Button;
 let phase: Phase;
 let go_c: number;
+let itemX: number;
+
 const gameScene: Scene =
   new Scene(
     "Game",
     () => {
       go_c = 0;
+      itemX = 195;
       phase = Phase.GameOver;
       const root: SceneNode = gameScene._root;
 
@@ -191,7 +194,6 @@ const gameScene: Scene =
     }
   );
 
-let itemX: number = 195;
 function addItem(item: Item): void {
   gameScene._root._add(item);
   item._rel = { x: itemX, y: 330 };
