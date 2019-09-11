@@ -50,8 +50,8 @@ window.addEventListener("load", async (): Promise<any> => {
     (): void => {
       const scaleX: number = window.innerWidth / canvas.width;
       const scaleY: number = window.innerHeight / canvas.height;
-      let scaleToFit: number = Math.min(scaleX, scaleY) | 0;
-      scaleToFit = scaleToFit <= 0 ? 1 : scaleToFit;
+      let scaleToFit: number = ~~(Math.min(scaleX, scaleY) / .25) * .25;
+      scaleToFit = scaleToFit < 1 ? 1 : scaleToFit;
       const size: number[] = [canvas.width * scaleToFit, canvas.height * scaleToFit];
       const offset: number[] = [(window.innerWidth - size[0]) / 2, (window.innerHeight - size[1]) / 2];
       const rule: string = "translate(" + offset[0] + "px, " + offset[1] + "px) scale(" + scaleToFit + ")";
