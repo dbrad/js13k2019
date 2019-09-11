@@ -32,6 +32,13 @@ const gameScene: Scene =
       phase = Phase.GameOver;
       const root: SceneNode = gameScene._root;
 
+      if(document.monetization && document.monetization.state === "started") {
+        const subItem: Item = bandageItem();
+        subItem._name = "Coil Bonus Bandage";
+        gameState._inventory.push(subItem);
+        addItem(subItem);
+      }
+
       root._add(gameState._tray);
       gameState._tray._rel = { x: 80, y: 280 };
 

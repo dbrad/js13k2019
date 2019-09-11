@@ -1,3 +1,7 @@
+interface Document {
+  monetization: any;
+}
+
 function shuffle<T>(array: T[]): T[] {
   let currentIndex: number = array.length, temporaryValue: T, randomIndex: number;
   const arr: T[] = array.slice();
