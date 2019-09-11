@@ -15,7 +15,7 @@ function restAction(): ActionCard {
   const action: ActionCard = new ActionCard(
     "rest",
     ["heal 10% hp"],
-    "any dice, 1 food",
+    "any dice + 1 food",
     green,
     (): boolean => {
       return childrenValid(action) && gameState._food > 0 && gameState._hp < gameState._maxHp;
@@ -64,8 +64,8 @@ function eatAction(): ActionCard {
 
   const action: ActionCard = new ActionCard(
     "eat",
-    ["gain max hp equal to half a dice value, rounded up"],
-    "any dice, 2 food",
+    ["gain max hp equal to half the dice value, rounded up"],
+    "any dice + 2 food",
     green,
     (): boolean => {
       return childrenValid(action) && gameState._food >= 2;
