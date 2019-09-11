@@ -504,7 +504,7 @@ function bandageAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
     "max 2",
     (): boolean => {
-      return slot._total <= 3;
+      return slot._total <= 2;
     });
 
   const action: ActionCard = new ActionCard(

@@ -23,7 +23,7 @@ const gameOverScene: Scene =
     },
     (delta: number) => { },
     (delta: number) => {
-      drawText("your adventure comes to and end", SCREEN_WIDTH / 2, 165, { _textAlign: Align.C, _scale: 2 });
+      drawText("your adventure comes to an end", SCREEN_WIDTH / 2, 165, { _textAlign: Align.C, _scale: 2 });
       drawText("but it's really about the journey, isn't it?", SCREEN_WIDTH / 2, 181, { _textAlign: Align.C, _scale: 2 });
     }
   );
