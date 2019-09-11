@@ -19,7 +19,7 @@ class Dice extends SceneNode {
   public _used: boolean = false;
   public _lock: boolean = false;
   public _scale: number;
-  constructor(values: number[] = [1, 2, 3, 4, 5, 6], colour: number = 0xFFFFFFFF, scale: number = 2) {
+  constructor(values: number[] = [1, 2, 3, 4, 5, 6], colour: number = white, scale: number = 2) {
     super();
     this._values = values;
     this._colour = colour;
@@ -78,7 +78,7 @@ class Dice extends SceneNode {
   public _draw(delta: number, now: number): void {
     gl._col(this._colour);
     drawTexture(`d_${this._value}`, this._abs.x, this._abs.y, this._scale, this._scale);
-    gl._col(0xFFFFFFFF);
+    gl._col(white);
     if (this._lock) {
       drawTexture(`d_l`, this._abs.x, this._abs.y, this._scale, this._scale);
     }
@@ -123,7 +123,7 @@ class DiceTray extends SceneNode {
     super._update(delta, now);
   }
   public _draw(delta: number, now: number): void {
-    gl._col(0xFFFFFFFF);
+    gl._col(white);
     super._draw(delta, now);
   }
 }

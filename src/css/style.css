@@ -5,7 +5,7 @@ html {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #1b2632;
+  background-color: #1f2f33;
 }
 
 #stage {
@@ -16,6 +16,7 @@ html {
   user-select: none;
   -webkit-user-select: none;
   display: inline-block;
+  border: 1px solid white;
 }
 
 canvas {

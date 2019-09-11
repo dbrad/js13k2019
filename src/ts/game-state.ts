@@ -6,8 +6,7 @@ enum Dif {
   None,
   Easy,
   Medium,
-  Hard,
-  Boss
+  Hard
 }
 
 enum GameLen {
@@ -62,5 +61,17 @@ function heal(val: number): void {
   gameState._hp += val;
   if (gameState._hp > gameState._maxHp) {
     gameState._hp = gameState._maxHp;
+  }
+}
+
+function getInventoryActions(): void {
+  for (const item of gameState._inventory) {
+    if (item._type === ItemType.combat &&
+      (gameState._encounter._type === EncounterType.Fight || gameState._encounter._type === EncounterType.Boss)) {
+      gameState._encounter._add(item._action());
+    }
+    if (item._type === ItemType.any) {
+      gameState._encounter._add(item._action());
+    }
   }
 }

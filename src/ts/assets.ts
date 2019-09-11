@@ -1,4 +1,5 @@
 /// <reference path="./gl.ts" />
+/// <reference path="./util.ts" />
 
 type Texture = {
   atlas: WebGLTexture;
@@ -11,8 +12,8 @@ type Texture = {
 };
 
 type TextureJson = {
-  t: "sprite" | "row";
-  n: string|string[];
+  t: "s" | "r";
+  n: string | string[];
   x: number;
   y: number;
   w: number;
@@ -34,7 +35,7 @@ async function load(url: string): Promise<{}> {
     "url": "sheet.png",
     "textures": [
       {
-        "t": "sprite",
+        "t": "s",
         "n": "cursor",
         "x": 0,
         "y": 10,
@@ -42,7 +43,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "d_s",
         "x": 16,
         "y": 10,
@@ -50,7 +51,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "d_1",
         "x": 32,
         "y": 10,
@@ -58,7 +59,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "d_2",
         "x": 48,
         "y": 10,
@@ -66,7 +67,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "d_3",
         "x": 64,
         "y": 10,
@@ -74,7 +75,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "d_4",
         "x": 80,
         "y": 10,
@@ -82,7 +83,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "d_5",
         "x": 96,
         "y": 10,
@@ -90,7 +91,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "d_6",
         "x": 112,
         "y": 10,
@@ -98,7 +99,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "d_l",
         "x": 128,
         "y": 10,
@@ -106,7 +107,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "solid",
         "x": 1,
         "y": 0,
@@ -114,7 +115,7 @@ async function load(url: string): Promise<{}> {
         "h": 1
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "g_0",
         "x": 0,
         "y": 26,
@@ -122,7 +123,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "g_1",
         "x": 16,
         "y": 26,
@@ -130,7 +131,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "s_0",
         "x": 32,
         "y": 26,
@@ -138,7 +139,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "s_1",
         "x": 48,
         "y": 26,
@@ -146,7 +147,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "b_0",
         "x": 64,
         "y": 26,
@@ -154,7 +155,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "b_1",
         "x": 80,
         "y": 26,
@@ -162,7 +163,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "w_0",
         "x": 96,
         "y": 26,
@@ -170,7 +171,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "w_1",
         "x": 112,
         "y": 26,
@@ -178,23 +179,23 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "br_0",
-        "x": 128,
-        "y": 26,
+        "x": 96,
+        "y": 42,
         "w": 16,
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "br_1",
-        "x": 144,
-        "y": 26,
+        "x": 112,
+        "y": 42,
         "w": 16,
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "node",
         "x": 0,
         "y": 42,
@@ -202,7 +203,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "gr_0",
         "x": 16,
         "y": 42,
@@ -210,7 +211,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "gr_1",
         "x": 24,
         "y": 42,
@@ -218,7 +219,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "gr_2",
         "x": 16,
         "y": 50,
@@ -226,7 +227,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "gr_3",
         "x": 24,
         "y": 50,
@@ -234,7 +235,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "tree",
         "x": 32,
         "y": 42,
@@ -242,7 +243,7 @@ async function load(url: string): Promise<{}> {
         "h": 16
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "buc",
         "x": 48,
         "y": 42,
@@ -250,7 +251,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "sh",
         "x": 48,
         "y": 50,
@@ -258,7 +259,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "dag",
         "x": 56,
         "y": 42,
@@ -266,7 +267,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "sw",
         "x": 56,
         "y": 50,
@@ -274,7 +275,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "heal",
         "x": 64,
         "y": 42,
@@ -282,7 +283,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "sprite",
+        "t": "s",
         "n": "die",
         "x": 72,
         "y": 42,
@@ -290,7 +291,7 @@ async function load(url: string): Promise<{}> {
         "h": 8
       },
       {
-        "t": "row",
+        "t": "r",
         "n": [
           "a",
           "b",
@@ -320,10 +321,6 @@ async function load(url: string): Promise<{}> {
           "z",
           ".",
           "!",
-          "?",
-          ",",
-          "'",
-          "\""
         ],
         "x": 0,
         "y": 0,
@@ -331,7 +328,7 @@ async function load(url: string): Promise<{}> {
         "h": 5
       },
       {
-        "t": "row",
+        "t": "r",
         "n": [
           "1",
           "2",
@@ -347,24 +344,20 @@ async function load(url: string): Promise<{}> {
           "[",
           "]",
           "-",
-          "^",
           "+",
-          "=",
           "/",
           "\\",
           "|",
           ":",
-          ";",
           "(",
           ")",
           "<",
           ">",
-          "_",
-          "{",
-          "}",
-          "*",
+          ",",
+          "'",
+          '"',
           "%",
-          "~"
+          "?"
         ],
         "x": 0,
         "y": 5,
@@ -373,7 +366,7 @@ async function load(url: string): Promise<{}> {
       }
     ]
   };
-  
+
   const image: HTMLImageElement = new Image();
 
   return new Promise((resolve, reject) => {
@@ -383,7 +376,7 @@ async function load(url: string): Promise<{}> {
         ATLAS_STORE.set(sheet.name, glTexture);
 
         for (const texture of sheet.textures) {
-          if (texture.t === "sprite") {
+          if (texture.t === "s") {
             TEXTURE_STORE.set(texture.n as string, {
               atlas: glTexture,
               w: texture.w,
@@ -394,7 +387,7 @@ async function load(url: string): Promise<{}> {
               v1: (texture.y + texture.h) / image.height
             });
           } else {
-            for(let ox: number = texture.x, i: number = 0; ox < image.width; ox += texture.w) {
+            for (let ox: number = texture.x, i: number = 0; ox < image.width; ox += texture.w) {
               TEXTURE_STORE.set(texture.n[i], {
                 atlas: glTexture,
                 w: texture.w,

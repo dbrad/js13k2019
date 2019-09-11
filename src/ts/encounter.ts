@@ -5,6 +5,7 @@
 /// <reference path="./sprite.ts" />
 /// <reference path="./consts.ts" />
 /// <reference path="./game-state.ts" />
+/// <reference path="./util.ts" />
 
 enum EncounterType {
   Empty,
@@ -17,6 +18,7 @@ enum EncounterType {
 class Encounter extends SceneNode {
   public _type: EncounterType;
   public _name: string;
+  public _tips: string[] = [];
   public _enemy: Enemy;
   public _isComplete: boolean = false;
   public _onComplete: () => void = (): void => { };
@@ -36,6 +38,16 @@ class Encounter extends SceneNode {
       this._enemy = null;
     }
   }
+
+  public _removeActionCards(name: string): void {
+    for (const [id, child] of this._nodes) {
+      if (child instanceof ActionCard && child._name === name) {
+        child._visible = false;
+        child._destroy();
+      }
+    }
+  }
+
   public _update(delta: number, now: number): void {
     let actionCount: number = 0;
     let row: number = 0;
@@ -44,7 +56,7 @@ class Encounter extends SceneNode {
       if (child instanceof ActionCard) {
         actionCount++;
         if (child._enabled && !child._anim) {
-          if (row > 3) {
+          if (row > 2) {
             row = 0;
             col++;
           }
@@ -63,6 +75,12 @@ class Encounter extends SceneNode {
     super._update(delta, now);
   }
   public _draw(delta: number, now: number): void {
+    drawText("tips", 400, 210, { _textAlign: Align.C, _scale: 2, _colour: 0xFF403B27 });
+    let tipY: number = 222;
+    for (const tip of this._tips) {
+      drawText(tip, 400, tipY, { _textAlign: Align.C, _colour: 0xFF403B27 });
+      tipY += 12;
+    }
     super._draw(delta, now);
   }
 }
@@ -122,15 +140,14 @@ class EncounterMap extends SceneNode {
 
   public _draw(delta: number, now: number): void {
     super._draw(delta, now);
-    gl._col(0Xffffffff);
+    gl._col(white);
     drawTexture("solid", this._abs.x, this._abs.y, 800, 1);
     gl._col(0Xaa000000);
     drawTexture("solid", this._abs.x + this._size.x / 2 - 100, this._abs.y + 2, 200, 12);
-    if(this._playerNode._encounter) {
-      drawText(this._playerNode._encounter._name, this._abs.x + this._size.x / 2, this._abs.y + 2, {_textAlign: Align.CENTER, _scale: 2});
+    if (this._playerNode._encounter) {
+      drawText(this._playerNode._encounter._name, this._abs.x + this._size.x / 2, this._abs.y + 2, { _textAlign: Align.C, _scale: 2 });
     } else {
-      drawText("forest entrance", this._abs.x + this._size.x / 2, this._abs.y + 2, {_textAlign: Align.CENTER, _scale: 2});
-
+      drawText("forest entrance", this._abs.x + this._size.x / 2, this._abs.y + 2, { _textAlign: Align.C, _scale: 2 });
     }
   }
 }
@@ -148,23 +165,25 @@ class EncounterNode extends SceneNode {
 
   public _draw(delta: number, now: number): void {
     if (this._next) {
-      gl._col(0xFFFFFFFF);
+      gl._col(white);
       const origin: V2 = V2.add(this._abs, { x: 8, y: 8 });
       drawLine(origin, V2.add(origin, { x: 16, y: 0 }));
     }
     if (!this._encounter || this._encounter._type === EncounterType.Empty) {
       gl._col(0xFFff8888);
     } else if (this._encounter._type === EncounterType.Camp) {
-      gl._col(0xFF22ff22);
+      //gl._col(0xFF22ff22);
+      gl._col(0xFFff8888);
     } else if (this._encounter._type === EncounterType.Loot) {
       gl._col(0xFF22ffff);
     } else if (this._encounter._type === EncounterType.Fight) {
-      gl._col(0xFF3399ff);
+      //gl._col(0xFF3399ff);
+      gl._col(0xFFff8888);
     } else if (this._encounter._type === EncounterType.Boss) {
       gl._col(0xFF2222ff);
     }
     drawTexture("node", this._abs.x, this._abs.y);
-    gl._col(0xFFFFFFFF);
+    gl._col(white);
     super._draw(delta, now);
   }
 }

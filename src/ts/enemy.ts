@@ -1,12 +1,13 @@
 /// <reference path="./dice.ts" />
 /// <reference path="./scene-node.ts" />
 /// <reference path="./interpolator.ts" />
+/// <reference path="./util.ts" />
 
 class Enemy extends SceneNode {
   constructor(die: number[]) {
     super();
     this._size = { x: 80, y: 80 };
-    const dice: Dice = new Dice(die, 0xFFFFFFFF, 1);
+    const dice: Dice = new Dice(die, white, 1);
     dice._used = true;
     dice._rel.x = -16;
     this._add(dice);
@@ -32,11 +33,11 @@ class Enemy extends SceneNode {
   public _turn: () => void;
 
   public _draw(delta: number, now: number): void {
-    drawText(this._name, this._abs.x, this._abs.y + 17, { _textAlign: Align.RIGHT, _scale: 2 });
+    drawText(this._name, this._abs.x, this._abs.y + 17, { _textAlign: Align.R, _scale: 2 });
     for (let i: number = 0; i < this._desc.length; i++) {
-      drawText(this._desc[i], this._abs.x, this._abs.y + 28 + i * 6, { _textAlign: Align.RIGHT });
+      drawText(this._desc[i], this._abs.x, this._abs.y + 28 + i * 6, { _textAlign: Align.R });
     }
-    drawText(`${this._hp <= 0 ? 0 : this._hp}/${this._maxHp}`, 600, 330, { _textAlign: Align.RIGHT, _scale: 2 });
+    drawText(`${this._hp <= 0 ? 0 : this._hp}/${this._maxHp}`, 600, 330, { _textAlign: Align.R, _scale: 2 });
     super._draw(delta, now);
   }
 }

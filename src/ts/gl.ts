@@ -1,3 +1,5 @@
+/// <reference path="./util.ts" />
+
 namespace gl {
   let ctx: WebGLRenderingContext;
   let width: number;
@@ -26,7 +28,7 @@ namespace gl {
   let vertexAttr: number;
   let textureAttr: number;
   let colourAttr: number;
-  let c: number = 0xFFFFFFFF; // AABBGGRR
+  let c: number = white; // AABBGGRR
 
   export function _init(canvas: HTMLCanvasElement): void {
     width = canvas.width;

@@ -1,5 +1,6 @@
 /// <reference path="./gl.ts" />
 /// <reference path="./assets.ts" />
+/// <reference path="./util.ts" />
 
 function drawTexture(textureName: string, x: number, y: number, sx: number = 1, sy: number = 1): void {
   const t: Texture = TEXTURE_STORE.get(textureName);
@@ -11,9 +12,9 @@ function drawTexture(textureName: string, x: number, y: number, sx: number = 1, 
 }
 
 enum Align {
-  LEFT,
-  CENTER,
-  RIGHT
+  L,
+  C,
+  R
 }
 
 type TextParams = {
@@ -24,9 +25,9 @@ type TextParams = {
 };
 
 function drawText(text: string, x: number, y: number,
-  params: TextParams = { _colour: 0xFFFFFFFF, _textAlign: Align.LEFT, _scale: 1, _wrap: 0 }): void {
-  params._colour = params._colour || 0xFFFFFFFF;
-  params._textAlign = params._textAlign || Align.LEFT;
+  params: TextParams = { _colour: white, _textAlign: Align.L, _scale: 1, _wrap: 0 }): void {
+  params._colour = params._colour || white;
+  params._textAlign = params._textAlign || Align.L;
   params._scale = params._scale || 1;
   params._wrap = params._wrap || 0;
 
@@ -35,9 +36,9 @@ function drawText(text: string, x: number, y: number,
   let offx: number = 0;
   const lineLength: number = params._wrap === 0 ? text.split("").length * 6 : params._wrap;
   let alignmentOffset: number = 0;
-  if (params._textAlign === Align.CENTER) {
+  if (params._textAlign === Align.C) {
     alignmentOffset = ~~(-lineLength / 2);
-  } else if (params._textAlign === Align.RIGHT) {
+  } else if (params._textAlign === Align.R) {
     alignmentOffset = ~~-lineLength;
   }
 
@@ -60,10 +61,10 @@ function drawText(text: string, x: number, y: number,
     }
     offx += 6 * params._scale;
   }
-  gl._col(0xFFFFFFFF);
+  gl._col(white);
 }
 
-function drawLine(start: V2, end: V2, color: number = 0xFFFFFFFF): void {
+function drawLine(start: V2, end: V2, color: number = white): void {
   let dx: number = Math.abs(end.x - start.x);
   let dy: number = Math.abs(end.y - start.y);
   let x: number = start.x;
@@ -86,5 +87,5 @@ function drawLine(start: V2, end: V2, color: number = 0xFFFFFFFF): void {
     }
     n -= 1;
   }
-  gl._col(0xFFFFFFFF);
+  gl._col(white);
 }

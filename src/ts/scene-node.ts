@@ -1,4 +1,5 @@
 /// <reference path="./interpolator.ts" />
+/// <reference path="./util.ts" />
 
 let idGen: number = 0;
 
@@ -131,7 +132,7 @@ class SceneNode {
         drawTexture("solid", this._abs.x + this._size.x - 1, this._abs.y, 1, this._size.y);
         drawTexture("solid", this._abs.x, this._abs.y, this._size.x, 1);
         drawTexture("solid", this._abs.x, this._abs.y + this._size.y - 1, this._size.x, 1);
-        gl._col(0xFFFFFFFF);
+        gl._col(white);
       }
       // @endif
     }

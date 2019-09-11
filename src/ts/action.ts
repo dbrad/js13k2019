@@ -2,6 +2,7 @@
 /// <reference path="./gl.ts" />
 /// <reference path="./draw.ts" />
 /// <reference path="./interpolator.ts" />
+/// <reference path="./util.ts" />
 
 class ActionSlot extends SceneNode {
   public _parent: ActionCard;
@@ -40,9 +41,9 @@ class ActionSlot extends SceneNode {
   }
 
   public _draw(delta: number, now: number): void {
-    gl._col(0Xffffffff);
+    gl._col(white);
     drawTexture("d_s", this._abs.x, this._abs.y, 2, 2);
-    drawText(this._text, this._abs.x + 17, this._abs.y + 34, { _textAlign: Align.CENTER, _colour: 0Xffcccccc });
+    drawText(this._text, this._abs.x + 17, this._abs.y + 34, { _textAlign: Align.C, _colour: 0Xffeeeeee });
     super._draw(delta, now);
   }
 }
@@ -50,14 +51,14 @@ class ActionSlot extends SceneNode {
 class ActionCard extends SceneNode {
   public _name: string = "";
   public _cost: string = "";
-  public _desc: string = "";
+  public _desc: string[] = [];
   public _colour: number = 0xFF000000;
   private _numSlots: number = 0;
   public _condition: () => boolean;
   public _onComplete: () => void;
   public _parent: Encounter;
 
-  constructor(name: string, desc: string, cost: string, colour: number, condition: () => boolean, onComplete: () => void) {
+  constructor(name: string, desc: string[], cost: string, colour: number, condition: () => boolean, onComplete: () => void) {
     super();
     this._name = name;
     this._desc = desc;
@@ -143,11 +144,15 @@ class ActionCard extends SceneNode {
     drawTexture("solid", this._abs.x, this._abs.y, this._size.x, this._size.y);
 
     // Body
-    gl._col(0Xffffffff);
+    gl._col(white);
     drawText(this._name, this._abs.x + 5, this._abs.y + 3, { _scale: 2 });
     drawTexture("solid", this._abs.x + 5, this._abs.y + 14, this._size.x - 10, 1);
     drawText(`cost: ${this._cost}`, this._abs.x + 5, this._abs.y + 16);
-    drawText(this._desc, this._abs.x + 5, this._abs.y + 22, { _wrap: 160 });
+    let dy: number = this._abs.y + 22;
+    for(const d of this._desc) {
+      drawText(d, this._abs.x + 5, dy, { _wrap: 160 });
+      dy += 6;
+    }
     super._draw(delta, now);
   }
 }

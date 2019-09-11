@@ -1,5 +1,6 @@
 /// <reference path="./scene-node.ts" />
 /// <reference path="./mouse.ts" />
+/// <reference path="./util.ts" />
 
 namespace SceneManager {
   const scenes: Map<string, Scene> = new Map();
@@ -100,10 +101,10 @@ class Scene {
   }
 
   public _draw(delta: number, now: number): void {
+    this._root._draw(delta, now);
     if (this._drawFn) {
       this._drawFn(delta, now);
     }
-    this._root._draw(delta, now);
     this._cursor._draw(delta, now);
     // @ifdef DEBUG
     drawText(`${this._cursor._abs.x}, ${this._cursor._abs.y}`, this._cursor._abs.x + 16, this._cursor._abs.y + 16);

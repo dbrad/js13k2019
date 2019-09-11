@@ -5,6 +5,7 @@
 /// <reference path="../dice.ts" />
 /// <reference path="../encounter-factory.ts" />
 /// <reference path="../scene-node.ts" />
+/// <reference path="../util.ts" />
 
 enum Phase {
   Begin,
@@ -18,11 +19,14 @@ enum Phase {
 
 let fwdBtn: Button;
 let endBtn: Button;
-let phase: Phase = Phase.Begin;
+let phase: Phase;
+let go_c: number;
 const gameScene: Scene =
   new Scene(
     "Game",
     () => {
+      go_c = 0;
+      phase = Phase.GameOver;
       const root: SceneNode = gameScene._root;
 
       root._add(gameState._tray);
@@ -87,19 +91,51 @@ const gameScene: Scene =
         endBtn._enabled = endBtn._visible = false;
       } else {
         if (phase === Phase.GameOver) {
-          // TODO: Gameover sequence
+          if (go_c >= 280) {
+            SceneManager._pop();
+            SceneManager._push("GameOver");
+          }
+          else {
+            go_c += 4;
+          }
         } else if (phase === Phase.Begin) {
           gameState._def = 0;
           gameState._debuffs.length = 0;
-          for (const item of gameState._inventory) {
-            if (item._type === ItemType.combat &&
-              (gameState._encounter._type === EncounterType.Fight || gameState._encounter._type === EncounterType.Boss)) {
-              gameState._encounter._add(item._action());
-            }
-            if (item._type === ItemType.any) {
-              gameState._encounter._add(item._action());
+
+          if (gameState._encounter && gameState._encounter._type !== EncounterType.Loot) {
+            getInventoryActions();
+          } else if (gameState._encounter && gameState._encounter._type === EncounterType.Loot) {
+            // limit player to 6 dice
+            if (gameState._tray._dice.length >= 6) {
+              gameState._encounter._removeActionCards("train");
+              gameState._encounter._removeActionCards("take a risk");
+              gameState._encounter._removeActionCards("meditate");
             }
           }
+          phase = Phase.Rolling;
+        } else if (phase === Phase.Restock) {
+          for (const [id, child] of gameState._encounter._nodes) {
+            if (child instanceof ActionCard) {
+              child._reset();
+            }
+          }
+          gameState._def = 0;
+
+          let stuns: number = 0;
+          for (const debuff of gameState._debuffs) {
+            switch (debuff) {
+              case "stun":
+                stuns++;
+                break;
+              case "bleed":
+                gameState._hp -= 1;
+                break;
+              default:
+            }
+          }
+          gameState._tray._lock(stuns);
+
+          gameState._debuffs.length = 0;
           phase = Phase.Rolling;
         } else if (phase === Phase.Rolling) {
           if (gameState._encounter._enemy) {
@@ -108,31 +144,13 @@ const gameScene: Scene =
           gameState._tray._restock(now);
           phase = Phase.Player;
           endBtn._enabled = endBtn._visible = true;
-        } else if (phase === Phase.Restock) {
-          for (const [id, child] of gameState._encounter._nodes) {
-            if (child instanceof ActionCard) {
-              child._reset();
-            }
-          }
-          gameState._def = 0;
-          for (const debuff of gameState._debuffs) {
-            switch (debuff) {
-              case "stun":
-                gameState._tray._lock(1);
-                break;
-              case "bleed":
-                break;
-              default:
-            }
-          }
-          gameState._debuffs.length = 0;
-          phase = Phase.Rolling;
         }
+
         switch (gameState._encounter._type) {
           case EncounterType.Boss:
           case EncounterType.Fight:
             if (phase === Phase.Player) {
-              if (gameState._encounter._enemy && gameState._encounter._enemy._isDead) {
+              if (gameState._encounter._enemy && gameState._encounter._enemy._isDead && gameState._map._playerNode._next) {
                 endBtn._enabled = endBtn._visible = false;
                 fwdBtn._enabled = fwdBtn._visible = true;
               }
@@ -163,9 +181,13 @@ const gameScene: Scene =
     },
     (delta: number) => {
       const root: SceneNode = gameScene._root;
-      drawText(`Food ${gameState._food}`, root._size.x - 70, root._size.y - 115, { _textAlign: Align.CENTER, _scale: 2 });
-      drawText(`DEF ${gameState._def}`, 80, 320, { _scale: 2, _colour: 0xFFF2A231 });
-      drawText(`HP  ${gameState._hp > 0 ? gameState._hp : 0}/${gameState._maxHp}`, 80, 335, { _scale: 2, _colour: 0xFF3326BE });
+      drawText(`food ${gameState._food}`, root._size.x - 70, root._size.y - 115, { _textAlign: Align.C, _scale: 2 });
+      drawText(`def ${gameState._def}`, 80, 320, { _scale: 2, _colour: 0xFFF2A231 });
+      drawText(`hp  ${gameState._hp > 0 ? gameState._hp : 0}/${gameState._maxHp}`, 80, 335, { _scale: 2, _colour: 0xFF3326BE });
+      if (phase === Phase.GameOver) {
+        gl._col(colourToHex(go_c > 255 ? 255 : go_c, 78, 72, 47));
+        drawTexture("solid", 0, 0, 800, 450);
+      }
     }
   );
 

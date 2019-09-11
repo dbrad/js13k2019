@@ -3,8 +3,8 @@
 /// <reference path="./gl.ts" />
 /// <reference path="./draw.ts" />
 /// <reference path="./scene-node.ts" />
-/// <reference path="./debug.ts" />
 /// <reference path="./zzfx.d.ts" />
+/// <reference path="./util.ts" />
 
 class Button extends SceneNode {
   public _text: string;
@@ -97,8 +97,8 @@ class Button extends SceneNode {
       }
       gl._col(this._colour);
       drawTexture("solid", this._abs.x, this._abs.y, this._size.x, this._size.y);
-      gl._col(0XFFFFFFFF);
-      drawText(this._text, this._abs.x + ~~(this._size.x / 2), this._abs.y - 2 + ~~(this._size.y / 2), { _textAlign: Align.CENTER });
+      gl._col(white);
+      drawText(this._text, this._abs.x + ~~(this._size.x / 2), this._abs.y - 2 + ~~(this._size.y / 2), { _textAlign: Align.C });
       super._draw(delta, now);
     }
   }

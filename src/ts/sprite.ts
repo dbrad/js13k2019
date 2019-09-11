@@ -2,6 +2,7 @@
 /// <reference path="./assets.ts" />
 /// <reference path="./draw.ts" />
 /// <reference path="./v2.ts" />
+/// <reference path="./util.ts" />
 
 type Frame = {
   _tex: string;
@@ -12,7 +13,7 @@ class Sprite extends SceneNode {
   private _frames: Frame[];
   private _scale: V2;
   private _colour: number;
-  constructor(frames: Frame[], position: V2, scale: V2 = { x: 1, y: 1 }, colour: number = 0xFFFFFFFF) {
+  constructor(frames: Frame[], position: V2, scale: V2 = { x: 1, y: 1 }, colour: number = white) {
     super();
     const texture: Texture = TEXTURE_STORE.get(frames[0]._tex);
     this._frames = frames;
@@ -71,7 +72,7 @@ class Sprite extends SceneNode {
   public _draw(delta: number, now: number): void {
     gl._col(this._colour);
     drawTexture(this._currentFrame._tex, this._abs.x, this._abs.y, this._scale.x, this._scale.y);
-    gl._col(0xFFFFFFFF);
+    gl._col(white);
     super._draw(delta, now);
   }
 }

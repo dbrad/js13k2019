@@ -4,10 +4,12 @@
 /// <reference path="./draw.ts" />
 /// <reference path="./mouse.ts" />
 /// <reference path="./stats.ts" />
+/// <reference path="./util.ts" />
 /// <reference path="./scene.ts" />
 /// <reference path="./scenes/main-menu-scene.ts" />
 /// <reference path="./scenes/game-setup-scene.ts" />
 /// <reference path="./scenes/game-scene.ts" />
+/// <reference path="./scenes/game-over-scene.ts" />
 
 window.addEventListener("load", async (): Promise<any> => {
   let then: number = 0;
@@ -28,12 +30,12 @@ window.addEventListener("load", async (): Promise<any> => {
     if (mouse._inputDisabled) {
       gl._col(0xAA222222);
       drawTexture("solid", 0, 0, SCREEN_WIDTH + 1, SCREEN_HEIGHT + 1);
-      gl._col(0xFFFFFFFF);
-      drawText("click to focus game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, { _textAlign: Align.CENTER, _scale: 4 });
+      gl._col(white);
+      drawText("click to focus game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, { _textAlign: Align.C, _scale: 4 });
     }
 
     gl._flush();
-    gl._col(0xFFFFFFFF);
+    gl._col(white);
     requestAnimationFrame(tick);
   }
 
@@ -69,6 +71,7 @@ window.addEventListener("load", async (): Promise<any> => {
   SceneManager._register(mainMenuScene);
   SceneManager._register(gameSetupScene);
   SceneManager._register(gameScene);
+  SceneManager._register(gameOverScene);
   SceneManager._push(mainMenuScene._name);
 
   requestAnimationFrame(tick);

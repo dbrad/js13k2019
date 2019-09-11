@@ -7,22 +7,18 @@
 // Empty Encounter Actions
 function restAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
-    "any",
+    anyCost,
     (): boolean => {
       return slot._total > 0;
     });
 
   const action: ActionCard = new ActionCard(
     "rest",
-    "heal 10% hp",
+    ["heal 10% hp"],
     "any dice, 1 food",
-    0xFF1A8944,
+    green,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      let result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      result = result && gameState._food > 0 && gameState._hp < gameState._maxHp;
-      return result;
+      return childrenValid(action) && gameState._food > 0 && gameState._hp < gameState._maxHp;
     },
     () => {
       gameState._food--;
@@ -43,14 +39,11 @@ function forageAction(): ActionCard {
 
   const action: ActionCard = new ActionCard(
     "forage",
-    "gather food equal to half the dice value, rounded down",
+    ["gather food equal to half the dice value, rounded down"],
     "min 2",
-    0xFF1A8944,
+    green,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
       gameState._food += ~~(action._total / 2);
@@ -64,22 +57,18 @@ function forageAction(): ActionCard {
 // Camp Encounter Actions
 function eatAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
-    "any",
+    anyCost,
     (): boolean => {
       return slot._total > 0;
     });
 
   const action: ActionCard = new ActionCard(
     "eat",
-    "gain max hp equal to half a dice value, rounded up",
+    ["gain max hp equal to half a dice value, rounded up"],
     "any dice, 2 food",
-    0xFF1A8944,
+    green,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      let result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      result = result && gameState._food >= 2;
-      return result;
+      return childrenValid(action) && gameState._food >= 2;
     },
     () => {
       gameState._food -= 2;
@@ -94,22 +83,18 @@ function eatAction(): ActionCard {
 
 function sleepAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
-    "any",
+    anyCost,
     (): boolean => {
       return slot._total > 0;
     });
 
   const action: ActionCard = new ActionCard(
     "sleep",
-    "heal for dice value + 10% hp",
+    ["heal for dice value + 10% hp"],
     "any dice",
-    0xFF1A8944,
+    green,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      let result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      result = result && gameState._hp < gameState._maxHp;
-      return result;
+      return childrenValid(action) && gameState._hp < gameState._maxHp;
     },
     () => {
       heal(Math.ceil(action._total + ~~(gameState._maxHp * 0.10)));
@@ -122,21 +107,18 @@ function sleepAction(): ActionCard {
 
 function harvestAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
-    "any",
+    anyCost,
     (): boolean => {
       return slot._total > 0;
     });
 
   const action: ActionCard = new ActionCard(
     "harvest",
-    "gather food equal to the dice value",
-    "any",
-    0xFF1A8944,
+    ["gather food equal to the dice value"],
+    anyCost,
+    green,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
       gameState._food += ~~(action._total / 2);
@@ -150,21 +132,18 @@ function harvestAction(): ActionCard {
 // Default Fight Actions
 function attackAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
-    "any",
+    anyCost,
     (): boolean => {
       return slot._total > 0;
     });
 
   const action: ActionCard = new ActionCard(
     "attack",
-    "attack for dice value",
+    ["attack for dice value"],
     "any dice",
-    0xFF3326BE,
+    red,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
       gameState._encounter._enemy._hp -= action._total;
@@ -178,21 +157,18 @@ function attackAction(): ActionCard {
 
 function defendAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
-    "any",
+    anyCost,
     (): boolean => {
       return slot._total > 0;
     });
 
   const action: ActionCard = new ActionCard(
     "defend",
-    "gain defense for half of a dice value, rounded up",
+    ["defend for half the dice value, rounded up"],
     "any dice",
-    0xFF845700,
+    blue,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
       gameState._def += Math.ceil(action._total / 2);
@@ -206,30 +182,91 @@ function defendAction(): ActionCard {
 
 // Loot Actions
 // Loot - any 1 dice, Take the Item
-function lootAction(): ActionCard {
+function obtainAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
-    "any",
+    anyCost,
     (): boolean => {
       return slot._total > 0;
     });
 
   const item: Item = gameState._lootDeck.pop();
+  const tempAction: ActionCard = item._action();
 
   const action: ActionCard = new ActionCard(
-    "loot",
-    `obtain a [${item._name}] to use for the rest of this adventure`,
+    "obtain",
+    [
+      `obtain a [${item._name}]`,
+      ``,
+      `item:`,
+      tempAction._cost,
+      ...tempAction._desc
+    ],
     "any dice",
-    0xFF32AAEB,
+    gold,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
       gameState._inventory.push(item);
       addItem(item);
       getSound();
+      gameState._encounter._removeActionCards("abstain");
+      gameState._encounter._removeActionCards("sustain");
+      action._destroy();
+    });
+  action._add(slot);
+
+  return action;
+}
+
+function abstainAction(): ActionCard {
+  const slot: ActionSlot = new ActionSlot(
+    anyCost,
+    (): boolean => {
+      return slot._total > 0;
+    });
+
+  const action: ActionCard = new ActionCard(
+    "abstain",
+    [`skip this item, but gain 3 more max hp`],
+    "any dice",
+    gold,
+    (): boolean => {
+      return childrenValid(action);
+    },
+    () => {
+      gameState._maxHp += 2;
+      gameState._hp += 2;
+      healSound();
+      gameState._encounter._removeActionCards("obtain");
+      gameState._encounter._removeActionCards("sustain");
+      action._destroy();
+    });
+  action._add(slot);
+
+  return action;
+}
+
+function sustainAction(): ActionCard {
+  const slot: ActionSlot = new ActionSlot(
+    anyCost,
+    (): boolean => {
+      return slot._total > 0;
+    });
+
+  const action: ActionCard = new ActionCard(
+    "sustain",
+    [`skip this item, but gain 5 more food`],
+    "any dice",
+    gold,
+    (): boolean => {
+      return childrenValid(action);
+    },
+    () => {
+      gameState._food += 5;
+      getSound();
+      gameState._encounter._removeActionCards("obtain");
+      gameState._encounter._removeActionCards("abstain");
       action._destroy();
     });
   action._add(slot);
@@ -240,13 +277,13 @@ function lootAction(): ActionCard {
 // Train - any 2 dice, get a new normal Dice (123456)
 function trainAction(): ActionCard {
   const slot1: ActionSlot = new ActionSlot(
-    "any",
+    anyCost,
     (): boolean => {
       return slot1._total > 0;
     });
 
   const slot2: ActionSlot = new ActionSlot(
-    "any",
+    anyCost,
     (): boolean => {
       return slot2._total > 0;
     });
@@ -255,22 +292,21 @@ function trainAction(): ActionCard {
 
   const action: ActionCard = new ActionCard(
     "train",
-    `add a [normal die] to your collection`,
+    [`gain a [normal die]`,`values: 1 2 3 4 5 6`],
     "any 2 dice",
-    0xFF32AAEB,
+    brown,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
       gameState._inventory.push(item);
       const dice: Dice = new Dice([1, 2, 3, 4, 5, 6]);
       dice._lock = true;
-      gameState._tray._dice.push({ _values: [1, 2, 3, 4, 5, 6], _colour: 0XFFFFFFFF });
+      gameState._tray._dice.push({ _values: [1, 2, 3, 4, 5, 6], _colour: white });
       addItem(item);
       getSound();
+      gameState._encounter._removeActionCards("meditate");
+      gameState._encounter._removeActionCards("take a risk");
       action._destroy();
     });
   action._add(slot1);
@@ -278,6 +314,7 @@ function trainAction(): ActionCard {
 
   return action;
 }
+
 // Take a Risk - any 2 dice, get a risk reward dice (111666)
 function riskyAction(): ActionCard {
   const slot1: ActionSlot = new ActionSlot(
@@ -296,20 +333,19 @@ function riskyAction(): ActionCard {
 
   const action: ActionCard = new ActionCard(
     "take a risk",
-    `add a [risky die] to your collection`,
+    [`gain a [risky die]`, `values: 1 1 1 6 6 6`],
     "2 dice valued at 1 or 6",
-    0xFF32AAEB,
+    brown,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
       gameState._inventory.push(item);
       gameState._tray._dice.push({ _values: [1, 1, 1, 6, 6, 6], _colour: 0xFF8888FF });
       addItem(item);
       getSound();
+      gameState._encounter._removeActionCards("meditate");
+      gameState._encounter._removeActionCards("train");
       action._destroy();
     });
   action._add(slot1);
@@ -336,20 +372,19 @@ function middlingAction(): ActionCard {
 
   const action: ActionCard = new ActionCard(
     "meditate",
-    `add a [middling die] to your collection`,
+    [`gain a [middling die]`, `values: 2 3 3 4 4 5`],
     "2 dice valued at 3 or 4",
-    0xFF32AAEB,
+    brown,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
       gameState._inventory.push(item);
       gameState._tray._dice.push({ _values: [2, 3, 3, 4, 4, 5], _colour: 0xFFFF8888 });
       addItem(item);
       getSound();
+      gameState._encounter._removeActionCards("train");
+      gameState._encounter._removeActionCards("take a risk");
       action._destroy();
     });
   action._add(slot1);
@@ -367,15 +402,12 @@ function daggerAction(): ActionCard {
     });
 
   const action: ActionCard = new ActionCard(
-    "dagger",
-    "attack for dice value + 1",
-    "3 or lower",
-    0xFF3326BE,
+    daggerName,
+    [daggerDesc],
+    daggerCost,
+    red,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
       gameState._encounter._enemy._hp -= action._total + 1;
@@ -388,29 +420,32 @@ function daggerAction(): ActionCard {
 }
 
 function swordAction(): ActionCard {
-  const slot: ActionSlot = new ActionSlot(
-    "max 3",
+  const slot1: ActionSlot = new ActionSlot(
+    anyCost,
     (): boolean => {
-      return slot._total <= 3;
+      return slot1._total > 0;
+    });
+  const slot2: ActionSlot = new ActionSlot(
+    anyCost,
+    (): boolean => {
+      return slot2._total > 0;
     });
 
   const action: ActionCard = new ActionCard(
-    "dagger",
-    "attack for dice value + 1",
-    "3 or lower",
-    0xFF3326BE,
+    swordName,
+    [swordDesc],
+    swordCost,
+    red,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
-      gameState._encounter._enemy._hp -= action._total + 1;
+      gameState._encounter._enemy._hp -= action._total;
       dmgSound();
       action._hide(false);
     });
-  action._add(slot);
+  action._add(slot1);
+  action._add(slot2);
 
   return action;
 }
@@ -423,18 +458,15 @@ function bucklerAction(): ActionCard {
     });
 
   const action: ActionCard = new ActionCard(
-    "dagger",
-    "attack for dice value + 1",
-    "3 or lower",
-    0xFF3326BE,
+    bucklerName,
+    [bucklerDesc],
+    bucklerCost,
+    blue,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
-      gameState._encounter._enemy._hp -= action._total + 1;
+      gameState._def += action._total + 1;
       defSound();
       action._hide(false);
     });
@@ -445,24 +477,21 @@ function bucklerAction(): ActionCard {
 
 function shieldAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
-    "max 3",
+    "min 4",
     (): boolean => {
-      return slot._total <= 3;
+      return slot._total >= 4;
     });
 
   const action: ActionCard = new ActionCard(
-    "dagger",
-    "attack for dice value + 1",
-    "3 or lower",
-    0xFF3326BE,
+    shieldName,
+    [shieldDesc],
+    shieldCost,
+    blue,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
-      gameState._encounter._enemy._hp -= action._total + 1;
+      gameState._def += action._total;
       defSound();
       action._hide(false);
     });
@@ -473,24 +502,21 @@ function shieldAction(): ActionCard {
 
 function bandageAction(): ActionCard {
   const slot: ActionSlot = new ActionSlot(
-    "max 3",
+    "max 2",
     (): boolean => {
       return slot._total <= 3;
     });
 
   const action: ActionCard = new ActionCard(
-    "dagger",
-    "attack for dice value + 1",
-    "3 or lower",
-    0xFF3326BE,
+    bandageName,
+    [bandageDesc],
+    bandageCost,
+    green,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
-      gameState._encounter._enemy._hp -= action._total + 1;
+      heal(action._total);
       healSound();
       action._hide(false);
     });
@@ -507,22 +533,26 @@ function firstAidAction(): ActionCard {
     });
 
   const action: ActionCard = new ActionCard(
-    "dagger",
-    "attack for dice value + 1",
-    "3 or lower",
-    0xFF3326BE,
+    firstAidName,
+    [firstAidDesc],
+    firstAidCost,
+    green,
     (): boolean => {
-      const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
-      const conditions: boolean[] = slots.map(s => s._condition());
-      const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
-      return result;
+      return childrenValid(action);
     },
     () => {
-      gameState._encounter._enemy._hp -= action._total + 1;
+      heal(action._total + 1);
       healSound();
-      action._hide(false);
+      action._destroy();
     });
   action._add(slot);
 
   return action;
+}
+
+function childrenValid(action: ActionCard): boolean {
+  const slots: ActionSlot[] = Array.from(action._nodes, ([id, s]) => (s as ActionSlot));
+  const conditions: boolean[] = slots.map(s => s._condition());
+  const result: boolean = conditions.reduce((acc, value) => { return acc = acc && value; }, true);
+  return result;
 }
