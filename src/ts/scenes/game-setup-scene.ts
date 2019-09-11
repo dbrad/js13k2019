@@ -135,10 +135,8 @@ function setup(): void {
   gameState._lootDeck.push(daggerItem());
   gameState._lootDeck.push(daggerItem());
   gameState._lootDeck.push(swordItem());
-  gameState._lootDeck.push(swordItem());
   gameState._lootDeck.push(bucklerItem());
   gameState._lootDeck.push(bucklerItem());
-  gameState._lootDeck.push(shieldItem());
   gameState._lootDeck.push(shieldItem());
   gameState._lootDeck.push(bandageItem());
   gameState._lootDeck.push(bandageItem());
