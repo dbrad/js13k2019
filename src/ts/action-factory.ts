@@ -121,7 +121,7 @@ function harvestAction(): ActionCard {
       return childrenValid(action);
     },
     () => {
-      gameState._food += ~~(action._total / 2);
+      gameState._food += action._total;
       getSound();
       action._destroy();
     });
