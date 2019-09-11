@@ -1,4 +1,5 @@
 /// <reference path="./gl.ts" />
+/// <reference path="./util.ts" />
 
 type Texture = {
   atlas: WebGLTexture;
@@ -11,8 +12,8 @@ type Texture = {
 };
 
 type TextureJson = {
-  type: "sprite" | "row";
-  id: string|string[];
+  t: "s" | "r";
+  n: string | string[];
   x: number;
   y: number;
   w: number;
@@ -34,168 +35,264 @@ async function load(url: string): Promise<{}> {
     "url": "sheet.png",
     "textures": [
       {
-        "type": "sprite",
-        "id": "cursor",
+        "t": "s",
+        "n": "cursor",
         "x": 0,
         "y": 10,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "d_s",
+        "t": "s",
+        "n": "d_s",
         "x": 16,
         "y": 10,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "d_1",
+        "t": "s",
+        "n": "d_1",
         "x": 32,
         "y": 10,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "d_2",
+        "t": "s",
+        "n": "d_2",
         "x": 48,
         "y": 10,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "d_3",
+        "t": "s",
+        "n": "d_3",
         "x": 64,
         "y": 10,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "d_4",
+        "t": "s",
+        "n": "d_4",
         "x": 80,
         "y": 10,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "d_5",
+        "t": "s",
+        "n": "d_5",
         "x": 96,
         "y": 10,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "d_6",
+        "t": "s",
+        "n": "d_6",
         "x": 112,
         "y": 10,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "d_l",
+        "t": "s",
+        "n": "d_l",
         "x": 128,
         "y": 10,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "solid",
+        "t": "s",
+        "n": "solid",
         "x": 1,
         "y": 0,
         "w": 1,
         "h": 1
       },
       {
-        "type": "sprite",
-        "id": "g_0",
+        "t": "s",
+        "n": "g_0",
         "x": 0,
         "y": 26,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "g_1",
+        "t": "s",
+        "n": "g_1",
         "x": 16,
         "y": 26,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "s_0",
+        "t": "s",
+        "n": "s_0",
         "x": 32,
         "y": 26,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "s_1",
+        "t": "s",
+        "n": "s_1",
         "x": 48,
         "y": 26,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "node",
+        "t": "s",
+        "n": "b_0",
+        "x": 64,
+        "y": 26,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "t": "s",
+        "n": "b_1",
+        "x": 80,
+        "y": 26,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "t": "s",
+        "n": "w_0",
+        "x": 96,
+        "y": 26,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "t": "s",
+        "n": "w_1",
+        "x": 112,
+        "y": 26,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "t": "s",
+        "n": "br_0",
+        "x": 96,
+        "y": 42,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "t": "s",
+        "n": "br_1",
+        "x": 112,
+        "y": 42,
+        "w": 16,
+        "h": 16
+      },
+      {
+        "t": "s",
+        "n": "node",
         "x": 0,
         "y": 42,
         "w": 16,
         "h": 16
       },
       {
-        "type": "sprite",
-        "id": "gr_0",
+        "t": "s",
+        "n": "gr_0",
         "x": 16,
         "y": 42,
         "w": 8,
         "h": 8
       },
       {
-        "type": "sprite",
-        "id": "gr_1",
+        "t": "s",
+        "n": "gr_1",
         "x": 24,
         "y": 42,
         "w": 8,
         "h": 8
       },
       {
-        "type": "sprite",
-        "id": "gr_2",
+        "t": "s",
+        "n": "gr_2",
         "x": 16,
         "y": 50,
         "w": 8,
         "h": 8
       },
       {
-        "type": "sprite",
-        "id": "gr_3",
+        "t": "s",
+        "n": "gr_3",
         "x": 24,
         "y": 50,
         "w": 8,
         "h": 8
       },
       {
-        "type": "sprite",
-        "id": "tree",
+        "t": "s",
+        "n": "tree",
         "x": 32,
         "y": 42,
         "w": 16,
         "h": 16
       },
       {
-        "type": "row",
-        "id": [
+        "t": "s",
+        "n": "buc",
+        "x": 48,
+        "y": 42,
+        "w": 8,
+        "h": 8
+      },
+      {
+        "t": "s",
+        "n": "sh",
+        "x": 48,
+        "y": 50,
+        "w": 8,
+        "h": 8
+      },
+      {
+        "t": "s",
+        "n": "dag",
+        "x": 56,
+        "y": 42,
+        "w": 8,
+        "h": 8
+      },
+      {
+        "t": "s",
+        "n": "sw",
+        "x": 56,
+        "y": 50,
+        "w": 8,
+        "h": 8
+      },
+      {
+        "t": "s",
+        "n": "heal",
+        "x": 64,
+        "y": 42,
+        "w": 8,
+        "h": 8
+      },
+      {
+        "t": "s",
+        "n": "die",
+        "x": 72,
+        "y": 42,
+        "w": 8,
+        "h": 8
+      },
+      {
+        "t": "r",
+        "n": [
           "a",
           "b",
           "c",
@@ -224,10 +321,6 @@ async function load(url: string): Promise<{}> {
           "z",
           ".",
           "!",
-          "?",
-          ",",
-          "'",
-          "\""
         ],
         "x": 0,
         "y": 0,
@@ -235,8 +328,8 @@ async function load(url: string): Promise<{}> {
         "h": 5
       },
       {
-        "type": "row",
-        "id": [
+        "t": "r",
+        "n": [
           "1",
           "2",
           "3",
@@ -251,24 +344,20 @@ async function load(url: string): Promise<{}> {
           "[",
           "]",
           "-",
-          "^",
           "+",
-          "=",
           "/",
           "\\",
           "|",
           ":",
-          ";",
           "(",
           ")",
           "<",
           ">",
-          "_",
-          "{",
-          "}",
-          "*",
+          ",",
+          "'",
+          '"',
           "%",
-          "~"
+          "?"
         ],
         "x": 0,
         "y": 5,
@@ -277,18 +366,18 @@ async function load(url: string): Promise<{}> {
       }
     ]
   };
-  
+
   const image: HTMLImageElement = new Image();
 
   return new Promise((resolve, reject) => {
     try {
       image.addEventListener("load", () => {
-        const glTexture: WebGLTexture = gl.createTexture(image);
+        const glTexture: WebGLTexture = gl._createTexture(image);
         ATLAS_STORE.set(sheet.name, glTexture);
 
         for (const texture of sheet.textures) {
-          if (texture.type === "sprite") {
-            TEXTURE_STORE.set(texture.id as string, {
+          if (texture.t === "s") {
+            TEXTURE_STORE.set(texture.n as string, {
               atlas: glTexture,
               w: texture.w,
               h: texture.h,
@@ -298,8 +387,8 @@ async function load(url: string): Promise<{}> {
               v1: (texture.y + texture.h) / image.height
             });
           } else {
-            for(let ox: number = texture.x, i: number = 0; ox < image.width; ox += texture.w) {
-              TEXTURE_STORE.set(texture.id[i], {
+            for (let ox: number = texture.x, i: number = 0; ox < image.width; ox += texture.w) {
+              TEXTURE_STORE.set(texture.n[i], {
                 atlas: glTexture,
                 w: texture.w,
                 h: texture.h,

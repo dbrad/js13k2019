@@ -2,35 +2,35 @@
 /// <reference path="./events.ts" />
 
 namespace mouse {
-  export const position: V2 = { x: 400, y: 225 };
-  export const over: Map<number, SceneNode> = new Map();
-  export let inputDisabled: boolean = true;
-  let mouseDown: boolean = false;
+  export const _position: V2 = { x: 400, y: 225 };
+  export const _over: Map<number, SceneNode> = new Map();
+  export let _inputDisabled: boolean = true;
+  let mdown: boolean = false;
 
-  export function initialize(canvas: HTMLCanvasElement): void {
+  export function _initialize(canvas: HTMLCanvasElement): void {
     canvas.addEventListener("click", (event: MouseEvent) => {
       if (document.pointerLockElement === null) {
         canvas.requestPointerLock();
-      } else if (!inputDisabled) {
-        emit("mouseclick", V2.copy(position));
+      } else if (!_inputDisabled) {
+        emit("mclick", V2.copy(_position));
       }
     });
 
     canvas.addEventListener("mousedown", () => {
-      if (!inputDisabled) {
-        mouseDown = true;
-        emit("mousedown", V2.copy(position));
+      if (!_inputDisabled) {
+        mdown = true;
+        emit("mdown", V2.copy(_position));
       }
     });
 
     canvas.addEventListener("mouseup", () => {
-      if (!inputDisabled) {
-        mouseDown = false;
-        emit("mouseup", V2.copy(position));
+      if (!_inputDisabled) {
+        mdown = false;
+        emit("mup", V2.copy(_position));
       }
     });
 
-    const MOUSEMOVE_POLLING_RATE: number = 1000 / 60;
+    const POLL_RATE: number = 1000 / 60;
     let now: number;
     let then: number = 0;
     let timer: number = 0;
@@ -39,33 +39,33 @@ namespace mouse {
       const delta: number = now - then;
       timer += delta;
       then = now;
-      position.x += e.movementX;
-      position.y += e.movementY;
-      if (position.x >= 800) {
-        position.x = 800 - 1;
+      _position.x += e.movementX;
+      _position.y += e.movementY;
+      if (_position.x >= 800) {
+        _position.x = 800 - 1;
       }
-      if (position.y >= 349) {
-        position.y = 349 - 1;
+      if (_position.y >= 349) {
+        _position.y = 349 - 1;
       }
-      if (position.x < 0) {
-        position.x = 0;
+      if (_position.x < 0) {
+        _position.x = 0;
       }
-      if (position.y < 0) {
-        position.y = 0;
+      if (_position.y < 0) {
+        _position.y = 0;
       }
-      if (timer >= MOUSEMOVE_POLLING_RATE) {
+      if (timer >= POLL_RATE) {
         timer = 0;
-        emit("mousemove", V2.copy(position), mouseDown);
+        emit("mmove", V2.copy(_position), mdown);
       }
     }
 
     document.addEventListener("pointerlockchange", () => {
       if (document.pointerLockElement === canvas) {
         document.addEventListener("mousemove", updatePosition, false);
-        inputDisabled = false;
+        _inputDisabled = false;
       } else {
         document.removeEventListener("mousemove", updatePosition, false);
-        inputDisabled = true;
+        _inputDisabled = true;
       }
     }, false);
   }

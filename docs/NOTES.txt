@@ -172,23 +172,57 @@ Empty => null
 
 Loot
 ----
-Survival Handbook (any)
+Survival Handbook (camps/empty)
   Use die to get 2 food
 Bandage (any)
   Heal for 1 dice amount (max 3)
 First Aid Kit (Single use per encounter heal) (any)
   Heal for 1 dice x 2 amount
 Knife (combat)
-  Attack for 1 dice +1
+  Attack for 1 dice (max 3) +1
 Sword (combat)
   Attack for 2 dice
 Buckler (combat)
-  Defend for 1 dice +1
+  Defend for 1 dice (max 3) +1
 Iron Shield (combat)
-  Defend for 1 dice +3
+  Defend for 1/2 dice +3
+
 Risk/Reward (any)
   Add 111666
 Middle of the Road (any)
   Add 233445
 Standard Die (any)
   Add 123456
+
+
+ADD LOOT
+  Add Tooltips for loot?
+  
+  quick attack (max 3, +1) - dagger (once per turn)
+  strong attack (2 dice) - sword (once per turn)
+
+  small block - buckler (once per turn)
+  large block - shield (once per turn)
+
+  small heal - bandage (once per turn)
+  large heal - first aid kit (once per encounter)
+
+  normal dice
+  risk reward dice
+  middle of the road dice
+
+  +5 hp
+
+ADD GAMEOVER SEQUENCE
+  think of score values for each enemy type
+
+camps
+  Eat - Use 2 food + dice to increase HP by dice value / 2, rounded up
+  Sleep - Heal for dice value + 10%
+  Harvest - Get dice value of food
+
+Loot
+  Loot - any 1 dice, Take the Loot
+  Train - any 2 dice, get a new normal Dice (123456)
+  Take a Risk - any 2 dice, get a risk reward dice (111666)
+  Meditate - any 2 dice, get a middle of the road (233445)

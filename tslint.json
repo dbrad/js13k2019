@@ -82,9 +82,6 @@
       true,
       "always"
     ],
-    "variable-name": [
-      true
-    ],
     "whitespace": [
       true
     ]

@@ -1,3 +1,5 @@
+/// <reference path="./util.ts" />
+
 namespace gl {
   let ctx: WebGLRenderingContext;
   let width: number;
@@ -26,9 +28,9 @@ namespace gl {
   let vertexAttr: number;
   let textureAttr: number;
   let colourAttr: number;
-  let c: number = 0xFFFFFFFF; // AABBGGRR
+  let c: number = white; // AABBGGRR
 
-  export function init(canvas: HTMLCanvasElement): void {
+  export function _init(canvas: HTMLCanvasElement): void {
     width = canvas.width;
     height = canvas.height;
     ctx = canvas.getContext("webgl");
@@ -95,7 +97,7 @@ namespace gl {
     ctx.activeTexture(ctx.TEXTURE0);
   }
 
-  export function createTexture(image: HTMLImageElement): WebGLTexture {
+  export function _createTexture(image: HTMLImageElement): WebGLTexture {
     const texture: WebGLTexture = ctx.createTexture();
     ctx.bindTexture(ctx.TEXTURE_2D, texture);
     ctx.texParameteri(ctx.TEXTURE_2D, ctx.TEXTURE_WRAP_S, ctx.CLAMP_TO_EDGE);
@@ -107,31 +109,31 @@ namespace gl {
     return texture;
   }
 
-  export function col(AABBGGRR: number): void {
+  export function _col(AABBGGRR: number): void {
     c = AABBGGRR;
   }
 
-  export function bkg(r: number, g: number, b: number): void {
+  export function _bkg(r: number, g: number, b: number): void {
     ctx.clearColor(r, g, b, 1);
   }
 
-  export function cls(): void {
+  export function _cls(): void {
     ctx.clear(ctx.COLOR_BUFFER_BIT);
   }
 
-  export function tran(x: number, y: number): void {
+  export function _tran(x: number, y: number): void {
     mat[4] = mat[0] * x + mat[2] * y + mat[4];
     mat[5] = mat[1] * x + mat[3] * y + mat[5];
   }
 
-  export function scale(x: number, y: number): void {
+  export function _scale(x: number, y: number): void {
     mat[0] = mat[0] * x;
     mat[1] = mat[1] * x;
     mat[2] = mat[2] * y;
     mat[3] = mat[3] * y;
   }
 
-  export function rot(r: number): void {
+  export function _rot(r: number): void {
     const sr: number = Math.sin(r);
     const cr: number = Math.cos(r);
 
@@ -141,7 +143,7 @@ namespace gl {
     mat[3] = mat[1] * -sr + mat[3] * cr;
   }
 
-  export function push(): void {
+  export function _push(): void {
     stack[stackp + 0] = mat[0];
     stack[stackp + 1] = mat[1];
     stack[stackp + 2] = mat[2];
@@ -151,7 +153,7 @@ namespace gl {
     stackp += 6;
   }
 
-  export function pop(): void {
+  export function _pop(): void {
     stackp -= 6;
     mat[0] = stack[stackp + 0];
     mat[1] = stack[stackp + 1];
@@ -161,7 +163,7 @@ namespace gl {
     mat[5] = stack[stackp + 5];
   }
 
-  export function draw(texture: WebGLTexture, x: number, y: number, w: number, h: number, u0: number, v0: number, u1: number, v1: number): void {
+  export function _draw(texture: WebGLTexture, x: number, y: number, w: number, h: number, u0: number, v0: number, u1: number, v1: number): void {
     const x0: number = x;
     const y0: number = y;
     const x1: number = x + w;
@@ -227,7 +229,7 @@ namespace gl {
     }
   }
 
-  export function flush(): void {
+  export function _flush(): void {
     if (count === 0) {
       return;
     }
