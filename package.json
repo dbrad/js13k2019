@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "cssnano": "^4.1.10",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
     "gulp-clean-css": "^4.2.0",
